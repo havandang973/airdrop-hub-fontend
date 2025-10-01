@@ -52,9 +52,23 @@ export default function RootLayout({
           >
             <div className="relative flex flex-col h-screen">
               <Navbar />
-              <main className="container mx-auto pt-16 px-6 flex-grow">
-                {children}
+
+              <main className="flex justify-center items-start gap-6 px-4">
+                {/* <iframe
+                  className="flex-shrink-0 w-64 md:w-72 lg:w-80 h-[600px]"
+                  src="https://cdn.24h.com.vn/upload/3-2025/images/2025-07-10/html5_banner_thuong_1752133372_55/1752133372_index.html?cID=45&amp;pos=140&amp;1759198585058"
+                ></iframe> */}
+
+                <div className="flex-1 max-w-screen-2xl container mx-auto pt-16 px-6 flex-grow">
+                  {children}
+                </div>
+
+                {/* <iframe
+                  className="flex-shrink-0 w-64 md:w-72 lg:w-80 h-[600px]"
+                  src="https://cdn.24h.com.vn/upload/3-2025/images/2025-07-10/html5_banner_thuong_1752133372_55/1752133372_index.html?cID=45&amp;pos=140&amp;1759198585058"
+                ></iframe> */}
               </main>
+
               <footer className="w-full flex items-center justify-center py-3">
                 <Link
                   isExternal

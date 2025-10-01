@@ -40,6 +40,13 @@ import {
   IconNews,
 } from '@tabler/icons-react';
 
+type NavItem = {
+  label: string;
+  href: string;
+  icon: React.ReactNode;
+  children?: NavItem[]; // thêm optional children
+};
+
 export const Navbar = () => {
   const searchInput = (
     <Input
@@ -60,7 +67,7 @@ export const Navbar = () => {
   const locale = useLocale();
   const trans = useTranslations();
   const router = useRouter();
-  const navItems = [
+  const navItems: NavItem[] = [
     {
       label: trans('Home'),
       href: '/',
@@ -70,14 +77,6 @@ export const Navbar = () => {
       label: trans('Market'),
       href: '/market',
       icon: <IconGraph size={16} />,
-      children: [
-        {
-          label: trans('Spot'),
-          href: '/market/spot',
-          icon: <IconHome size={16} />,
-        },
-        { label: trans('Futures'), href: '/market/futures' },
-      ],
     },
     {
       label: trans('Airdrop'),
@@ -88,10 +87,6 @@ export const Navbar = () => {
       label: trans('News'),
       href: '/news',
       icon: <IconNews size={16} />,
-      children: [
-        { label: trans('News'), href: '/news/latest' },
-        { label: trans('News'), href: '/news/analysis' },
-      ],
     },
     {
       label: trans('About'),
@@ -123,7 +118,7 @@ export const Navbar = () => {
 
             return (
               <li key={item.href} className="relative group">
-                {item.children ? (
+                {item?.children ? (
                   <span
                     className={clsx(
                       'flex items-center cursor-pointer gap-2 px-2 py-1 transition',
