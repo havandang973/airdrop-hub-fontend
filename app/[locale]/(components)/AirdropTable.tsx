@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table as AntdTable, ConfigProvider, theme } from 'antd';
+import { Table as AntdTable, Card, ConfigProvider, theme } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTheme } from 'next-themes';
 import GradientSlider from './Slider';
@@ -321,25 +321,63 @@ const AirdropTable = () => {
   ];
 
   return (
-    <ConfigProvider
-      theme={{
-        algorithm:
-          themeNext.theme === 'dark'
-            ? theme.darkAlgorithm
-            : theme.defaultAlgorithm,
-        token: {
-          fontSize: 16,
-          padding: 20,
-        },
-      }}
-    >
-      <AntdTable
-        columns={columns}
-        dataSource={data}
-        onChange={handleChange}
-        pagination={{ pageSize: 10 }}
-      />
-    </ConfigProvider>
+    <div>
+      {/* Mobile view */}
+      <div className="flex flex-col gap-4 md:hidden">
+        {data.map((item) => (
+          <Card key={item.key} className="p-4 rounded-md shadow-sm">
+            <Link
+              href={`/${locale}/airdrop/${item.slug}`}
+              className="flex items-center gap-2"
+            >
+              <img
+                src={item.logo}
+                alt={item.name}
+                style={{ width: 24, height: 24, borderRadius: '50%' }}
+              />
+              <span className="font-semibold text-black dark:text-white hover:text-blue-500 transition-colors">
+                {item.name}
+              </span>
+            </Link>
+            <div className="flex justify-between text-sm mt-2">
+              <span>Raise</span>
+              <span className="font-semibold">{item.raise}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Stage</span>
+              <span className="font-semibold">{item.stage}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <GradientSlider score={item.moniScore} />
+              <span className="font-semibold">{item.moniScore}</span>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Desktop view */}
+      <div className="hidden md:block">
+        <ConfigProvider
+          theme={{
+            algorithm:
+              themeNext.theme === 'dark'
+                ? theme.darkAlgorithm
+                : theme.defaultAlgorithm,
+            token: {
+              fontSize: 16,
+              padding: 20,
+            },
+          }}
+        >
+          <AntdTable
+            columns={columns}
+            dataSource={data}
+            onChange={handleChange}
+            pagination={{ pageSize: 10 }}
+          />
+        </ConfigProvider>
+      </div>
+    </div>
   );
 };
 

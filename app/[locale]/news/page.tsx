@@ -80,9 +80,9 @@ export default function Page() {
 
         <div className="mt-6 md:mt-0 md:ml-8">
           <img
-            src="https://rockiereact-tau.vercel.app/static/media/banner-01.eec598253cec8f46e54f.png"
+            src="https://rockiereact-tau.vercel.app/static/media/Illustration.0d5fa2201b35f5f13a14.png"
             alt=""
-            className="w-64 md:w-96"
+            className="w-64 md:w-92"
           />
         </div>
       </div>

@@ -43,7 +43,7 @@ import {
 type NavItem = {
   label: string;
   href: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   children?: NavItem[]; // thêm optional children
 };
 
@@ -77,6 +77,18 @@ export const Navbar = () => {
       label: trans('Market'),
       href: '/market',
       icon: <IconGraph size={16} />,
+      children: [
+        {
+          label: trans('Spot'),
+          href: '/market/spot',
+          icon: <IconGraph size={16} />,
+        },
+        {
+          label: trans('Futures'),
+          href: '/market/futures',
+          icon: <IconGraph size={16} />,
+        },
+      ],
     },
     {
       label: trans('Airdrop'),
@@ -99,8 +111,14 @@ export const Navbar = () => {
   const pathname = usePathname();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   return (
-    <HeroUINavbar maxWidth="full" position="sticky">
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
+    <HeroUINavbar
+      maxWidth="full"
+      position="sticky"
+      className="dark:bg-gray-900 bg-white fixed top-0 left-0 w-full z-50"
+      onMenuOpenChange={(open) => setOpen(open)}
+      isMenuOpen={open}
+    >
+      <NavbarContent className="basis-1/5 sm:basis-full " justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
             <Logo />
@@ -123,7 +141,7 @@ export const Navbar = () => {
                     className={clsx(
                       'flex items-center cursor-pointer gap-2 px-2 py-1 transition',
                       isActive
-                        ? 'text-primary'
+                        ? '!text-primary'
                         : 'text-foreground hover:text-primary'
                     )}
                   >
@@ -136,7 +154,7 @@ export const Navbar = () => {
                     className={clsx(
                       'flex items-center gap-2 px-2 py-1 transition',
                       isActive
-                        ? 'text-primary'
+                        ? '!text-primary'
                         : 'text-foreground hover:text-primary'
                     )}
                   >
@@ -146,8 +164,8 @@ export const Navbar = () => {
                 )}
 
                 {item.children && (
-                  <ul className="absolute left-0 pt-2 hidden group-hover:block bg-white shadow-lg rounded-md p-2 min-w-[180px]">
-                    {item.children.map((child) => {
+                  <ul className="absolute left-0 pt-2 hidden group-hover:block  shadow-lg rounded-md p-2 min-w-[180px]">
+                    {item.children.map((child: any) => {
                       const childUrl =
                         child.href === '/'
                           ? `/${locale}`
@@ -164,7 +182,7 @@ export const Navbar = () => {
                             className={clsx(
                               'flex items-center gap-2 px-2 py-1 transition',
                               isActiveChild
-                                ? 'text-primary'
+                                ? '!text-primary'
                                 : 'text-foreground hover:text-primary'
                             )}
                           >
@@ -183,11 +201,11 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarContent
-        className=" hidden lg:flex basis-1/5 sm:basis-full"
+        className="hidden lg:flex basis-1/5 sm:basis-full "
         justify="end"
       >
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-        <NavbarItem className="hidden lg:flex flex gap-2">
+        <NavbarItem className="hidden lg:flex gap-2">
           <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
             <TwitterIcon className="text-default-500" />
           </Link>
@@ -257,7 +275,7 @@ export const Navbar = () => {
         </NavbarItem>
       </NavbarContent>
 
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
+      <NavbarContent className="sm:hidden basis-1 pl-4 " justify="end">
         <Select
           // isOpen={open}
           // onOpenChange={setOpen}
@@ -318,9 +336,9 @@ export const Navbar = () => {
         <NavbarMenuToggle />
       </NavbarContent>
 
-      <NavbarMenu>
+      <NavbarMenu className="bg-white">
         {searchInput}
-        <ul className="mt-2 flex flex-col gap-2">
+        <ul className="mt-2 flex flex-col gap-2 ">
           {navItems.map((item) => {
             const url =
               item.href === '/' ? `/${locale}` : `/${locale}${item.href}`;
@@ -330,7 +348,6 @@ export const Navbar = () => {
                 : pathname === url || pathname.startsWith(url + '/');
 
             const isOpen = openMenu === item.href;
-
             return (
               <li key={item.href} className="relative">
                 <button
@@ -338,7 +355,7 @@ export const Navbar = () => {
                   className={clsx(
                     'flex w-full items-center justify-between px-2 py-1 transition',
                     isActive
-                      ? 'text-primary'
+                      ? '!text-primary'
                       : 'text-foreground hover:text-primary'
                   )}
                 >
@@ -348,7 +365,7 @@ export const Navbar = () => {
                         className={clsx(
                           'flex items-center cursor-pointer gap-2 px-2 py-1 transition',
                           isActive
-                            ? 'text-primary'
+                            ? '!text-primary'
                             : 'text-foreground hover:text-primary'
                         )}
                       >
@@ -368,6 +385,7 @@ export const Navbar = () => {
                           ? 'text-primary'
                           : 'text-foreground hover:text-primary'
                       )}
+                      onClick={() => setOpen(false)}
                     >
                       {item.icon}
                       {item.label}
@@ -393,9 +411,10 @@ export const Navbar = () => {
                             className={clsx(
                               'flex items-center gap-2 px-2 py-1 transition',
                               isActiveChild
-                                ? 'text-primary'
+                                ? '!text-primary'
                                 : 'text-foreground hover:text-primary'
                             )}
+                            onClick={() => setOpen(false)}
                           >
                             {child.icon}
                             {child.label}

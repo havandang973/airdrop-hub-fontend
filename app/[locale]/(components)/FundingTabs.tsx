@@ -14,7 +14,7 @@ const FundingTabs = (props: { defaultActiveKey: string }) => {
     {
       key: '1',
       label: (
-        <div className="p-3 flex flex-col justify-between rounded-md min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
+        <div className="whitespace-normal break-words p-3 flex flex-col justify-between rounded-md min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-gray-900 dark:text-gray-100">
               Market Overview
@@ -61,16 +61,12 @@ const FundingTabs = (props: { defaultActiveKey: string }) => {
           </div>
         </div>
       ),
-      children: (
-        // <Card className="dark:!bg-black !border-gray-200 dark:!border-gray-700">
-        <MarketTable />
-        // </Card>
-      ),
+      children: <MarketTable />,
     },
     {
       key: '2',
       label: (
-        <div className="p-3 flex flex-col justify-between rounded-md min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
+        <div className="whitespace-normal break-words p-3 flex flex-col justify-between rounded-md min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-gray-900 dark:text-gray-100">
               Airdrop List
@@ -107,16 +103,12 @@ const FundingTabs = (props: { defaultActiveKey: string }) => {
           </div>
         </div>
       ),
-      children: (
-        // <Card className="dark:!bg-black !border-gray-200 dark:!border-gray-700">
-        <AirdropTable />
-        // </Card>
-      ),
+      children: <AirdropTable />,
     },
     {
       key: '3',
       label: (
-        <div className="p-3 rounded-md  flex flex-col justify-between min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
+        <div className="whitespace-normal break-words p-3 rounded-md  flex flex-col justify-between min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-gray-900 dark:text-gray-100">
               Latest News
@@ -270,11 +262,13 @@ const FundingTabs = (props: { defaultActiveKey: string }) => {
         }
         .custom-tabs .ant-tabs-nav-list {
           width: 100%;
+          overflow-x: auto;
         }
         .custom-tabs .ant-tabs-tab {
           flex: 1; /* chia đều */
-          justify-content: center; /* căn giữa nội dung */
+          justify-content: center;
           max-width: none !important;
+          min-width: 250px;
         }
         .ant-tabs-tab-btn {
           width: 100%;
