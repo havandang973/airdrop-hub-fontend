@@ -114,7 +114,7 @@ export const Navbar = () => {
     <HeroUINavbar
       maxWidth="full"
       position="sticky"
-      className="dark:bg-gray-900 bg-white fixed top-0 left-0 w-full z-50"
+      // className="dark:bg-gray-900 bg-white fixed top-0 left-0 w-full z-50"
       onMenuOpenChange={(open) => setOpen(open)}
       isMenuOpen={open}
     >
