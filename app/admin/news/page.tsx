@@ -1,3 +1,8 @@
 export default function Page() {
-  return <div className="">News</div>;
+  return (
+    <div className="">
+      <h1 className="text-2xl font-semibold text-gray-900">News</h1>
+      <div className="mt-4 p-6 bg-white rounded-lg shadow-md">Content</div>
+    </div>
+  );
 }
