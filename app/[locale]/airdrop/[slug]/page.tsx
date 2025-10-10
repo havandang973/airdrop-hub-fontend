@@ -2,39 +2,25 @@
 
 import { Avatar, Card, Spin } from 'antd';
 import { useEffect, useState } from 'react';
+import { getAirdrop } from '../../../../lib/api/airdrop/getAirdrop';
+import { useGetAirdrops } from '@/lib/hooks/airdrop';
 
 export default function Page() {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: getAirdrop, isLoading } = useGetAirdrops();
+
+  const [data, setData] = useState<any>(getAirdrop);
+  console.log('getAirdrop', getAirdrop);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch('http://localhost:3001/airdrop');
-        if (!res.ok) throw new Error('Failed to fetch project');
-        const json = await res.json();
-        console.log(json);
-        setData(json[0]);
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    setData(getAirdrop?.[0] || null);
+  }, [getAirdrop]);
 
-    fetchData();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-[50vh]">
         <Spin size="large" />
       </div>
     );
-  }
-
-  if (!data) {
-    return <div className="text-center text-gray-400">No data found.</div>;
   }
 
   return (
@@ -46,15 +32,15 @@ export default function Page() {
           <Avatar
             size={{ xs: 60, sm: 80, md: 80, lg: 100, xl: 100, xxl: 100 }}
             src={
-              data.avatar ??
+              data?.avatar ??
               'https://img.cryptorank.io/coins/base_vol1759229258847.png'
             }
           />
           <div className="flex flex-col">
             <span className="font-semibold text-xl md:text-2xl">
-              {data.title}
+              {data?.title}
             </span>
-            <span className="text-sm text-gray-400">{data.slug}</span>
+            <span className="text-sm text-gray-400">{data?.slug}</span>
           </div>
         </div>
 
@@ -62,7 +48,7 @@ export default function Page() {
         <div className="flex flex-col gap-1">
           <span className="text-sm">Status</span>
           <span className="font-semibold text-xl md:text-2xl text-blue-500">
-            {data.status ?? 'N/A'}
+            {data?.status ?? 'N/A'}
           </span>
         </div>
 
@@ -70,7 +56,7 @@ export default function Page() {
         <div className="flex flex-col gap-1">
           <span className="text-sm text-gray-500">Total raised</span>
           <span className="font-semibold text-xl md:text-2xl">
-            {data.totalRaise ? `$ ${data.totalRaise}` : 'N/A'}
+            {data?.totalRaise ? `$ ${data?.totalRaise}` : 'N/A'}
           </span>
         </div>
       </div>
@@ -81,7 +67,7 @@ export default function Page() {
           <h1 className="font-semibold text-xl md:text-2xl">
             Funding Insights
           </h1>
-          <div dangerouslySetInnerHTML={{ __html: data.content }} />
+          <div dangerouslySetInnerHTML={{ __html: data?.content }} />
         </div>
 
         <div className="flex gap-10 w-full">
