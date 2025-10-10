@@ -1,7 +1,6 @@
 'use client';
 import { IconPlus } from '@tabler/icons-react';
 import { Button, Form, Input, Select, Upload } from 'antd';
-import CustomEditor from '../../(components)/custom-editor';
 
 export default function Page() {
   return (
@@ -59,7 +58,7 @@ export default function Page() {
             <Input />
           </Form.Item>
 
-          <CustomEditor />
+          {/* <CustomEditor /> */}
 
           <Form.Item label=" ">
             <Button type="primary" htmlType="submit">
