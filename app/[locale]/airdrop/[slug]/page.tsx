@@ -2,17 +2,21 @@
 
 import { Avatar, Card, Spin } from 'antd';
 import { useEffect, useState } from 'react';
-import { getAirdrop } from '../../../../lib/api/airdrop/getAirdrop';
-import { useGetAirdrops } from '@/lib/hooks/airdrop';
+import { useGetAirdrop, useGetAirdrops } from '@/lib/hooks/airdrop';
+import { useParams } from 'next/navigation';
 
 export default function Page() {
-  const { data: getAirdrop, isLoading } = useGetAirdrops();
+  const params = useParams();
+  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+  console.log('🚀 slug:', slug);
+  const { data: getAirdrop, isLoading } = useGetAirdrop(slug as string, !!slug);
+  console.log('🚀 getAirdrop:', getAirdrop);
+  const [zoomSrc, setZoomSrc] = useState<string | null>(null);
 
   const [data, setData] = useState<any>(getAirdrop);
-  console.log('getAirdrop', getAirdrop);
 
   useEffect(() => {
-    setData(getAirdrop?.[0] || null);
+    setData(getAirdrop || null);
   }, [getAirdrop]);
 
   if (isLoading) {
@@ -67,10 +71,32 @@ export default function Page() {
           <h1 className="font-semibold text-xl md:text-2xl">
             Funding Insights
           </h1>
-          <div dangerouslySetInnerHTML={{ __html: data?.content }} />
+          <div
+            className="prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{ __html: data?.content || '' }}
+            onClick={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (target.tagName === 'IMG') {
+                setZoomSrc(target.src);
+              }
+            }}
+          />
         </div>
 
-        <div className="flex gap-10 w-full">
+        {zoomSrc && (
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-zoom-out"
+            onClick={() => setZoomSrc(null)}
+          >
+            <img
+              src={zoomSrc}
+              alt="Zoomed image"
+              className="max-w-[95vw] max-h-[95vh] rounded-xl shadow-2xl object-contain transition-transform duration-300"
+            />
+          </div>
+        )}
+
+        {/* <div className="flex gap-10 w-full">
           <div className="flex-3 !space-y-5">
             <Card title="Card title" className="!border-2 !border-gray-200">
               Card content
@@ -87,7 +113,7 @@ export default function Page() {
               Card content
             </Card>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

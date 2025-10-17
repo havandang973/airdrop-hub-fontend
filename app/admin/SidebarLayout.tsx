@@ -74,6 +74,21 @@ export default function SidebarLayout({
       ],
     },
     {
+      label: 'Categories & Tags',
+      href: '',
+      icon: <IconStar size={20} />,
+      children: [
+        {
+          label: 'Categories',
+          href: '/admin/category',
+        },
+        {
+          label: 'Tags',
+          href: '/admin/tag',
+        },
+      ],
+    },
+    {
       label: 'Setting',
       href: '/admin/setting',
       icon: <IconSettings size={20} />,

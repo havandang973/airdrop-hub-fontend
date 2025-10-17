@@ -23,7 +23,6 @@ export default function Page() {
     typeof window !== 'undefined'
       ? localStorage.getItem('theme') || 'light'
       : 'light';
-
   useCryptoMarquee(theme === 'dark' ? 'dark' : 'light');
 
   return (

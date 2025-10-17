@@ -11,6 +11,6 @@ export interface IAccountWallet {
 }
 
 export const getAirdrops = async (): Promise<any[]> => {
-  const { data } = await callApi.get("airdrops");
+  const { data } = await callApi.get("airdrop");
   return data;
 };

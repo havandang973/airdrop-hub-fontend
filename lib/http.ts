@@ -8,17 +8,13 @@ const callApi = axios.create({
   timeout: 15_000,
 });
 
-// callApi.interceptors.request.use(
-//   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-//     const { initDataRaw, initData } = retrieveLaunchParams();
+callApi.interceptors.request.use(
+  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+    config.headers['x-api-key'] = `bestsecretkeyever`;
 
-//     if (initDataRaw) {
-//       config.headers['Authorization'] = `tma ${initDataRaw}`;
-//     }
-
-//     return config;
-//   },
-// );
+    return config;
+  },
+);
 
 // Client for calling public resources
 const callResource = axios.create({

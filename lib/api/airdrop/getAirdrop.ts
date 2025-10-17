@@ -10,7 +10,7 @@ export interface IAccountWallet {
     freeBalance: number
 }
 
-export const getAirdrop = async (): Promise<any[]> => {
-    const { data } = await callApi.get("airdrop");
+export const getAirdrop = async (slug: string): Promise<any[]> => {
+    const { data } = await callApi.get(`/airdrop/${slug}`);
     return data;
 };
