@@ -5,6 +5,10 @@ import { createAirdrop } from "../api/airdrop/createAirdrop";
 import { updateAirdrop } from "../api/airdrop/updateAirdrop";
 import { deleteAirdrop } from "../api/airdrop/deleteAirdrop";
 import { getAirdrop } from "../api/airdrop/getAirdrop";
+import { getAirdropPost } from "../api/airdrop/getAirdropPost";
+import { getAirdropPosts } from "../api/airdrop/getAirdropPosts";
+import { createAirdropPost } from "../api/airdrop/createAirdropPost";
+import { deleteAirdropPost } from "../api/airdrop/deleteAirdropPost";
 
 export const useGetAirdrops = (enabled?: boolean) => {
   return useQuery({
@@ -28,6 +32,27 @@ export const useGetAirdrop = (slug: string, enabled: boolean) => {
   });
 };
 
+export const useGetAirdropPost = (id: number, enabled: boolean) => {
+  return useQuery({
+    queryKey: ['airdrop-post', id, appConfig.version],
+    queryFn: () => getAirdropPost(id),
+    enabled,
+    refetchIntervalInBackground: true,
+    staleTime: 0,
+    refetchInterval: 15_000,
+  });
+};
+
+export const useGetAirdropPosts = () => {
+  return useQuery({
+    queryKey: ['airdrop-posts', appConfig.version],
+    queryFn: () => getAirdropPosts(),
+    enabled: true,
+    refetchIntervalInBackground: true,
+    staleTime: 0,
+    refetchInterval: 15_000,
+  });
+};
 
 export function mutationCreateAirdrop() {
   return useMutation({
@@ -37,6 +62,16 @@ export function mutationCreateAirdrop() {
     },
   });
 }
+
+export function mutationCreateAirdropPost() {
+  return useMutation({
+    mutationKey: ['create-airdrop-post'],
+    mutationFn: (obj: object) => createAirdropPost(obj),
+    onSuccess: () => {
+    },
+  });
+}
+
 
 export function mutationUpdateAirdrop() {
   return useMutation({
@@ -58,14 +93,13 @@ export const useDeleteAirdrop = () => {
   });
 };
 
-// export const useGetAccountLogs = (params: any, id?: string) => {
-//   return useQuery({
-//     queryKey: ['account-logs', params, appConfig.version],
-//     queryFn: () => getAccountLogs(params, id),
-//     enabled: true,
-//     refetchIntervalInBackground: true,
-//     staleTime: 15_000,
-//     refetchInterval: 15_000,
-//   });
-// };
+export const useDeleteAirdropPost = () => {
+  const queryClient = useQueryClient();
 
+  return useMutation({
+    mutationFn: (id: number) => deleteAirdropPost(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['airdrop-posts'] });
+    },
+  });
+};

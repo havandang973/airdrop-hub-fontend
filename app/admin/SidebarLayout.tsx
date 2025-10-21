@@ -6,8 +6,10 @@ import { fontSans } from '@/config/fonts';
 import { NextIntlClientProvider } from 'next-intl';
 import {
   IconBookmarkEdit,
+  IconBrandAmigo,
   IconDashboard,
   IconNews,
+  IconPencil,
   IconSettings,
   IconStar,
 } from '@tabler/icons-react';
@@ -51,6 +53,44 @@ export default function SidebarLayout({
         {
           label: 'Edit',
           href: '/admin/airdrop/edit',
+        },
+      ],
+    },
+    {
+      label: 'Post Airdrop',
+      href: '/admin/airdrop-post',
+      icon: <IconPencil size={20} />,
+      children: [
+        {
+          label: 'List',
+          href: '/admin/airdrop-post',
+        },
+        {
+          label: 'Create',
+          href: '/admin/airdrop-post/create',
+        },
+        {
+          label: 'Edit',
+          href: '/admin/airdrop-post/edit',
+        },
+      ],
+    },
+    {
+      label: 'Funds',
+      href: '/admin/funds',
+      icon: <IconBrandAmigo size={20} />,
+      children: [
+        {
+          label: 'List',
+          href: '/admin/funds',
+        },
+        {
+          label: 'Create',
+          href: '/admin/funds/create',
+        },
+        {
+          label: 'Edit',
+          href: '/admin/funds/edit',
         },
       ],
     },

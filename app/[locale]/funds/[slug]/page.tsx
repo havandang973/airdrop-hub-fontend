@@ -1,57 +1,48 @@
 'use client';
-import React, { useState } from 'react';
+
 import {
-  Table as AntdTable,
+  Avatar,
   Card,
   ConfigProvider,
-  theme,
   Spin,
-  Empty,
-  Badge,
+  Table as AntdTable,
+  theme,
   Tag,
 } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { useTheme } from 'next-themes';
-import GradientSlider from './Slider';
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import {
+  useGetAirdrop,
+  useGetAirdropPost,
+  useGetAirdrops,
+} from '@/lib/hooks/airdrop';
+import { useParams } from 'next/navigation';
+import { stat } from 'fs';
+import { IconDots, IconPointFilled } from '@tabler/icons-react';
+import { useGetFund } from '@/lib/hooks/fund';
+import { Link } from '@heroui/link';
 import { useLocale } from 'next-intl';
-import { useGetAirdrops } from '@/lib/hooks/airdrop';
-import { Chip } from '@heroui/chip';
-import { Avatar, AvatarGroup } from '@heroui/avatar';
-import { Tooltip } from '@heroui/tooltip';
+import { useTheme } from 'next-themes';
+import { ColumnsType } from 'antd/es/table';
+import { toNumber } from 'lodash';
 
-interface AirdropData {
-  id: string;
-  name: string;
-  slug: string;
-  logo?: string;
-  raise?: string;
-  status?: string;
-  investors?: string;
-  investorlogo?: string;
-  date?: string;
-  funds?: any[];
-}
-
-const toNumber = (val: string) => {
-  if (!val) return 0;
-  const num = parseFloat(val.replace(/[^0-9.]/g, ''));
-  if (val.includes('M')) return num * 1_000_000;
-  if (val.includes('K')) return num * 1_000;
-  return num;
-};
-
-const AirdropTable = () => {
-  const [sortedInfo, setSortedInfo] = useState<any>({});
+export default function Page() {
+  const params = useParams();
   const themeNext = useTheme();
+  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+  const { data: fund, isLoading } = useGetFund(slug as string, !!slug);
+  const [zoomSrc, setZoomSrc] = useState<string | null>(null);
   const locale = useLocale();
-  const { data: airdrops, isLoading } = useGetAirdrops();
+  const [data, setData] = useState<any>(fund);
+  useEffect(() => {
+    setData(fund || null);
+  }, [fund]);
+  const [sortedInfo, setSortedInfo] = useState<any>({});
 
   const handleChange = (_: any, __: any, sorter: any) => {
     setSortedInfo(sorter);
   };
 
-  const columns: ColumnsType<AirdropData> = [
+  const columns: ColumnsType<any> = [
     {
       title: 'Name',
       dataIndex: 'name',
@@ -108,40 +99,6 @@ const AirdropTable = () => {
       ),
     },
     {
-      title: 'Funds and Investors',
-      dataIndex: 'funds',
-      key: 'funds',
-      ellipsis: true,
-      showSorterTooltip: false,
-      render: (_, record) => {
-        const funds = record?.funds || [];
-
-        if (funds.length === 0) {
-          return <span style={{ color: '#999' }}>—</span>;
-        }
-
-        return (
-          <div className="flex items-center gap-2 max-w-[250px]">
-            <AvatarGroup isBordered max={5} size="sm">
-              {funds.map((item: any) => (
-                <Tooltip key={item.id} content={item.fund?.name || 'Unknown'}>
-                  <Link href={`/${locale}/funds/${item.fund?.slug || ''}`}>
-                    <Avatar
-                      src={item.fund?.logo}
-                      name={item.fund?.name?.[0] || '?'}
-                      size="sm"
-                      alt={item.fund?.name}
-                    />
-                  </Link>
-                </Tooltip>
-              ))}
-            </AvatarGroup>
-          </div>
-        );
-      },
-    },
-
-    {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
@@ -151,42 +108,62 @@ const AirdropTable = () => {
       ellipsis: true,
       showSorterTooltip: false,
     },
-    // {
-    //   title: 'Moni Score',
-    //   dataIndex: 'moniScore',
-    //   key: 'moniScore',
-    //   sorter: (a, b) => (a.moniScore || 0) - (b.moniScore || 0),
-    //   sortOrder: sortedInfo.columnKey === 'moniScore' ? sortedInfo.order : null,
-    //   ellipsis: true,
-    //   showSorterTooltip: false,
-    //   render: (text, record) => (
-    //     <div className="flex flex-col pointer-events-none">
-    //       <span className="font-semibold">{record.moniScore}</span>
-    //       <GradientSlider score={record.moniScore} />
-    //     </div>
-    //   ),
-    // },
   ];
 
-  if (isLoading)
+  if (isLoading) {
     return (
-      <div className="flex justify-center py-10">
+      <div className="flex justify-center items-center h-[50vh]">
         <Spin size="large" />
       </div>
     );
-
-  if (!airdrops || airdrops.length === 0)
-    return (
-      <div className="flex justify-center py-10">
-        <Empty description="No data found" />
-      </div>
-    );
+  }
 
   return (
-    <div>
-      {/* Mobile view */}
+    <div className="space-y-10">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+        {/* Avatar + Name */}
+        <div className="flex gap-5 items-center">
+          <div>
+            <Avatar
+              size={{ xs: 60, sm: 80, md: 80, lg: 100, xl: 100, xxl: 100 }}
+              src={data?.logo}
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold text-xl md:text-2xl">
+              {data?.name}
+            </span>
+            <span className="text-sm text-gray-400">{data?.description}</span>
+          </div>
+        </div>
+
+        {/* Status */}
+        {/* <div className="flex flex-col gap-1">
+          <span className="text-sm">Status</span>
+          <span className="font-semibold text-xl md:text-2xl text-blue-500 text-capitalize">
+            {data?.status ?? 'N/A'}
+          </span>
+        </div> */}
+
+        {/* Raised */}
+        {/* <div className="flex flex-col gap-1">
+          <span className="text-sm text-gray-500">Total raised</span>
+          <span className="font-semibold text-xl md:text-2xl">
+            {data?.raise ? `$ ${data?.raise}` : 'N/A'}
+          </span>
+        </div> */}
+      </div>
+
+      <div className="flex flex-col">
+        <span className="font-semibold text-xl md:text-2xl">
+          {data?.name} Funding Rounds
+        </span>
+      </div>
+
+      {/* Main content */}
       <div className="flex flex-col gap-4 md:hidden">
-        {airdrops.map((item: AirdropData) => (
+        {fund?.airdrops?.map((item: any) => (
           <Card key={item.id} className="p-4 rounded-md shadow-sm">
             <Link
               href={`/${locale}/airdrop/${item.slug}`}
@@ -225,7 +202,6 @@ const AirdropTable = () => {
         ))}
       </div>
 
-      {/* Desktop view */}
       <div className="hidden md:block">
         <ConfigProvider
           theme={{
@@ -240,8 +216,9 @@ const AirdropTable = () => {
           }}
         >
           <AntdTable
+            className="shadow-sm "
             columns={columns}
-            dataSource={airdrops}
+            dataSource={fund?.airdrops || []}
             rowKey="id"
             onChange={handleChange}
             pagination={{ pageSize: 10 }}
@@ -250,6 +227,4 @@ const AirdropTable = () => {
       </div>
     </div>
   );
-};
-
-export default AirdropTable;
+}

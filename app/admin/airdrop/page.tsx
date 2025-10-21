@@ -47,13 +47,13 @@ export default function Page() {
       width: 80,
     },
     {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
       render: (text: string, record: any) => (
         <Flex align="center" gap={10}>
           <img
-            src={record.avatar || record.image || '/default-avatar.png'}
+            src={record.logo || record.image || '/default-logo.png'}
             alt={text}
             className="w-8 h-8 rounded-full object-cover"
           />
@@ -62,14 +62,9 @@ export default function Page() {
       ),
     },
     {
-      title: 'Category',
-      dataIndex: 'category',
-      key: 'category',
-    },
-    {
       title: 'Total Raise',
-      dataIndex: 'totalRaise',
-      key: 'total_raise',
+      dataIndex: 'raise',
+      key: 'raise',
       render: (v: number) => v?.toLocaleString(),
     },
     {

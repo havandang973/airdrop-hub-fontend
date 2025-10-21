@@ -1,40 +1,41 @@
 'use client';
 import { IconPlus } from '@tabler/icons-react';
-import { Button, Form, Input, Select, Upload, message } from 'antd';
-import { mutationCreateAirdrop } from '@/lib/hooks/airdrop';
+import { Button, Form, Input, Select, Switch, Upload, message } from 'antd';
+import {
+  mutationCreateAirdrop,
+  mutationCreateAirdropPost,
+  useGetAirdrops,
+} from '@/lib/hooks/airdrop';
 import slugify from 'slugify'; // npm install slugify
-import TextArea from 'antd/es/input/TextArea';
-import { useRouter } from 'next/navigation';
-import TinyEditor from '../(components)/TinyEditor';
+import { SelectItem } from '@heroui/select';
+import { Avatar } from '@heroui/avatar';
+import TinyEditor from '../../airdrop/(components)/TinyEditor';
 
 export default function Page() {
   const [form] = Form.useForm();
-  const { mutate: createAirdrop } = mutationCreateAirdrop();
-  const router = useRouter();
+  const { mutate: createAirdrop } = mutationCreateAirdropPost();
+  const { data: airdrops, isLoading } = useGetAirdrops();
+
   // ⚙️ Cấu hình Cloudinary
   const CLOUD_NAME = 'dzdbaikqm'; // 👉 thay bằng của bạn
   const UPLOAD_PRESET = 'upload_img'; // 👉 preset bạn tạo trong Cloudinary
 
   const handleSubmit = (values: any) => {
-    const slug = slugify(values.name, { lower: true });
-    console.log('📝 Form Values:', slug);
-    const logoUrl = values.logo?.[0]?.response?.secure_url || '';
-
     const payload = {
       name: values.name.trim(),
-      slug,
-      logo: logoUrl,
+      content: values.content || '',
       status: values.status || null,
-      raise: values.raise ? parseFloat(values.raise) : null,
+      date: values.date || null,
+      airdropId: values.airdrop || null,
       createdBy: 1, // sau này thay = userId thật
     };
 
     console.log('📦 Payload gửi đi:', payload);
+
     createAirdrop(payload, {
       onSuccess: () => {
         message.success('✅ Airdrop created successfully!');
         form.resetFields();
-        router.push('/admin/airdrop');
       },
       onError: (err: any) => {
         console.error(err);
@@ -53,7 +54,10 @@ export default function Page() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-gray-900">Create Airdrop</h1>
+      <h1 className="text-2xl font-semibold text-gray-900">
+        Create Post Airdrop
+      </h1>
+
       <div className="mt-4 p-6 bg-white rounded-lg shadow-md">
         <Form
           form={form}
@@ -70,68 +74,54 @@ export default function Page() {
             name="name"
             rules={[{ required: true, message: 'Please enter a name!' }]}
           >
-            <Input placeholder="Enter Airdrop title" />
-          </Form.Item>
-
-          {/* 🟢 AVATAR */}
-          <Form.Item
-            label="Logo"
-            name="logo"
-            valuePropName="fileList"
-            getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
-            rules={[
-              {
-                required: true,
-                message: 'Please upload an logo!',
-                validator: (_, value) =>
-                  value && value.length > 0
-                    ? Promise.resolve()
-                    : Promise.reject(new Error('Please upload an logo!')),
-              },
-            ]}
-          >
-            <Upload
-              name="file"
-              listType="picture-card"
-              maxCount={1}
-              action={`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`}
-              data={{ upload_preset: UPLOAD_PRESET }}
-              onChange={handleUploadChange}
-            >
-              <IconPlus size={20} stroke={1} />
-            </Upload>
-          </Form.Item>
-
-          <Form.Item
-            label="Description"
-            name="description"
-            rules={[{ required: true, message: 'Please enter description!' }]}
-          >
-            <TextArea rows={4} placeholder="Enter description" />
+            <Input placeholder="Enter Airdrop Post name" />
           </Form.Item>
 
           {/* 🟢 STATUS */}
           <Form.Item label="Status" name="status">
             <Select placeholder="Select status (optional)" allowClear>
-              <Select.Option value="active">Active</Select.Option>
-              <Select.Option value="inactive">Inactive</Select.Option>
+              <Select.Option value="Closed">Closed</Select.Option>
+              <Select.Option value="Compeleted">Compeleted</Select.Option>
             </Select>
-          </Form.Item>
-
-          {/* 🟢 TOTAL RAISE */}
-          <Form.Item label="Raise" name="raise">
-            <Input
-              type="number"
-              placeholder="Enter total raise amount (optional)"
-            />
           </Form.Item>
 
           <Form.Item label="Date" name="date">
             <Input type="date" placeholder="Select date (optional)" />
           </Form.Item>
 
+          <Form.Item label="Hide" name="hide">
+            <Switch />
+          </Form.Item>
+
+          <Form.Item
+            label="Airdrop"
+            name="airdrop"
+            rules={[{ required: true, message: 'Please select an Airdrop!' }]}
+          >
+            <Select
+              placeholder="Select an Airdrop"
+              loading={!airdrops?.length}
+              allowClear
+              showSearch
+              optionFilterProp="children"
+            >
+              {airdrops?.map((item) => (
+                <Select.Option key={item.id} value={item.id}>
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={item.logo || '/default-logo.png'}
+                      alt={item.name}
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                    <span>{item.name}</span>
+                  </div>
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
           {/* 🟢 CONTENT */}
-          {/* <Form.Item
+          <Form.Item
             label="Content"
             name="content"
             rules={[
@@ -147,7 +137,7 @@ export default function Page() {
             getValueFromEvent={(content) => content}
           >
             <TinyEditor />
-          </Form.Item> */}
+          </Form.Item>
 
           {/* 🟢 SUBMIT BUTTON */}
           <Form.Item label=" ">
