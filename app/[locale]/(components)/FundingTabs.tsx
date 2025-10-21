@@ -4,15 +4,17 @@ import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import { useEffect } from 'react';
 import { useCryptoWidget } from '../widget';
+import AirdropTable from './AirdropTable';
+import MarketTable from './MarketTable';
 const Tabs = dynamic(() => import('antd/es/tabs'), { ssr: false });
-const FundingTabs = () => {
+const FundingTabs = (props: { defaultActiveKey: string }) => {
   useCryptoWidget();
 
   const items = [
     {
       key: '1',
       label: (
-        <div className="p-3 flex flex-col justify-between rounded-md min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
+        <div className="whitespace-normal break-words p-3 flex flex-col justify-between rounded-md min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-gray-900 dark:text-gray-100">
               Market Overview
@@ -59,21 +61,12 @@ const FundingTabs = () => {
           </div>
         </div>
       ),
-      children: (
-        // <Card className="dark:!bg-black !border-gray-200 dark:!border-gray-700">
-        <div
-          className="cryptohopper-web-widget"
-          data-id="1"
-          data-table_columns="rank,name,price_usd,market_cap_usd,volume_usd_24h,available_supply,percent_change_24h,weekly,symbol,price_btc"
-          data-numcoins="100"
-        ></div>
-        // </Card>
-      ),
+      children: <MarketTable />,
     },
     {
       key: '2',
       label: (
-        <div className="p-3 flex flex-col justify-between rounded-md min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
+        <div className="whitespace-normal break-words p-3 flex flex-col justify-between rounded-md min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-gray-900 dark:text-gray-100">
               Airdrop List
@@ -110,26 +103,12 @@ const FundingTabs = () => {
           </div>
         </div>
       ),
-      children: (
-        <Card className="dark:!bg-black !border-gray-200 dark:!border-gray-700">
-          <div className="flex gap-4 overflow-x-auto">
-            <Card className="min-w-[160px] text-center">
-              TokenX - Ends in 5d
-            </Card>
-            <Card className="min-w-[160px] text-center">
-              Solana - Ends in 12d
-            </Card>
-            <Card className="min-w-[160px] text-center">
-              LayerZero - Ends in 30d
-            </Card>
-          </div>
-        </Card>
-      ),
+      children: <AirdropTable />,
     },
     {
       key: '3',
       label: (
-        <div className="p-3 rounded-md  flex flex-col justify-between min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
+        <div className="whitespace-normal break-words p-3 rounded-md  flex flex-col justify-between min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-gray-900 dark:text-gray-100">
               Latest News
@@ -186,6 +165,69 @@ const FundingTabs = () => {
                 26 Sep, 2025
               </span>
             </div>
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white">
+                Kraken Funding: Monumental $500M Round Boosts Exchange
+              </p>
+              <span className="text-xs text-blue-500">Funding round</span>
+              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
+                26 Sep, 2025
+              </span>
+            </div>
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white">
+                Kraken Funding: Monumental $500M Round Boosts Exchange
+              </p>
+              <span className="text-xs text-blue-500">Funding round</span>
+              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
+                26 Sep, 2025
+              </span>
+            </div>
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white">
+                Kraken Funding: Monumental $500M Round Boosts Exchange
+              </p>
+              <span className="text-xs text-blue-500">Funding round</span>
+              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
+                26 Sep, 2025
+              </span>
+            </div>
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white">
+                Kraken Funding: Monumental $500M Round Boosts Exchange
+              </p>
+              <span className="text-xs text-blue-500">Funding round</span>
+              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
+                26 Sep, 2025
+              </span>
+            </div>
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white">
+                Kraken Funding: Monumental $500M Round Boosts Exchange
+              </p>
+              <span className="text-xs text-blue-500">Funding round</span>
+              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
+                26 Sep, 2025
+              </span>
+            </div>
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white">
+                Kraken Funding: Monumental $500M Round Boosts Exchange
+              </p>
+              <span className="text-xs text-blue-500">Funding round</span>
+              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
+                26 Sep, 2025
+              </span>
+            </div>
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white">
+                Kraken Funding: Monumental $500M Round Boosts Exchange
+              </p>
+              <span className="text-xs text-blue-500">Funding round</span>
+              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
+                26 Sep, 2025
+              </span>
+            </div>
           </div>
         </Card>
       ),
@@ -206,7 +248,7 @@ const FundingTabs = () => {
       >
         <Tabs
           destroyOnHidden={false}
-          defaultActiveKey="1"
+          defaultActiveKey={props.defaultActiveKey}
           items={items}
           tabPosition="top"
           className="w-full custom-tabs"
@@ -220,11 +262,13 @@ const FundingTabs = () => {
         }
         .custom-tabs .ant-tabs-nav-list {
           width: 100%;
+          overflow-x: auto;
         }
         .custom-tabs .ant-tabs-tab {
           flex: 1; /* chia đều */
-          justify-content: center; /* căn giữa nội dung */
+          justify-content: center;
           max-width: none !important;
+          min-width: 250px;
         }
         .ant-tabs-tab-btn {
           width: 100%;
