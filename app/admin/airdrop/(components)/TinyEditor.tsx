@@ -3,12 +3,15 @@ import { Editor } from '@tinymce/tinymce-react';
 
 export default function TinyEditor({
   onChange,
+  value,
 }: {
   onChange?: (content: string) => void;
+  value?: string;
 }) {
   return (
     <Editor
       apiKey="gdodu3mdloaydidzg3n4ss8oeht5nr3abzurx0k56rh3x2ef"
+      value={value}
       onEditorChange={(content: any) => {
         if (onChange) onChange(content);
       }}
@@ -71,7 +74,6 @@ export default function TinyEditor({
           ),
         uploadcare_public_key: 'dc99983c438546c2fafc',
       }}
-      initialValue="Welcome to TinyMCE!"
     />
   );
 }

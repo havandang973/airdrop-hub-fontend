@@ -1,24 +1,50 @@
 'use client';
-import { IconPlus } from '@tabler/icons-react';
-import { Button, Form, Input, Select, Switch, Upload, message } from 'antd';
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { Button, Form, Input, Select, Switch, message } from 'antd';
 import {
-  mutationCreateAirdrop,
-  mutationCreateAirdropPost,
   useGetAirdrops,
+  mutationUpdateAirdropPost,
+  useGetAirdropPostDetail,
 } from '@/lib/hooks/airdrop';
-import slugify from 'slugify'; // npm install slugify
-import { SelectItem } from '@heroui/select';
-import { Avatar } from '@heroui/avatar';
-import TinyEditor from '../../airdrop/(components)/TinyEditor';
+import dynamic from 'next/dynamic';
 
-export default function Page() {
+const TinyEditor = dynamic(
+  () => import('@/app/admin/airdrop/(components)/TinyEditor'),
+  {
+    ssr: false,
+  }
+);
+
+export default function EditAirdropPostPage() {
   const [form] = Form.useForm();
-  const { mutate: createAirdrop } = mutationCreateAirdropPost();
-  const { data: airdrops, isLoading } = useGetAirdrops();
+  const router = useRouter();
+  const { id } = useParams(); // 👉 /airdrop/posts/edit/[id]
+  const { data: airdrops } = useGetAirdrops();
+  const { data: postDetail, isLoading } = useGetAirdropPostDetail(
+    id as unknown as number,
+    !!id
+  );
+  const { mutate: updateAirdropPost } = mutationUpdateAirdropPost();
+  const [selectAirdropPost, setSelectAirdropPost] = useState<any>(null);
+  useEffect(() => {
+    setSelectAirdropPost(postDetail);
+  }, [postDetail]);
 
-  // ⚙️ Cấu hình Cloudinary
-  const CLOUD_NAME = 'dzdbaikqm'; // 👉 thay bằng của bạn
-  const UPLOAD_PRESET = 'upload_img'; // 👉 preset bạn tạo trong Cloudinary
+  useEffect(() => {
+    if (postDetail && selectAirdropPost) {
+      form.setFieldsValue({
+        name: selectAirdropPost.name,
+        content: selectAirdropPost.content,
+        status: selectAirdropPost.status,
+        date: selectAirdropPost.date
+          ? selectAirdropPost.date.split('T')[0]
+          : undefined,
+        visibility: selectAirdropPost.visibility,
+        airdrop: selectAirdropPost.airdropId,
+      });
+    }
+  }, [selectAirdropPost, form]);
 
   const handleSubmit = (values: any) => {
     const payload = {
@@ -26,36 +52,32 @@ export default function Page() {
       content: values.content || '',
       status: values.status || null,
       date: values.date || null,
-      airdropId: values.airdrop || null,
-      createdBy: 1, // sau này thay = userId thật
+      visibility: values.visibility || false,
+      airdropId: Number(values.airdrop) || null,
     };
 
-    console.log('📦 Payload gửi đi:', payload);
-
-    createAirdrop(payload, {
-      onSuccess: () => {
-        message.success('✅ Airdrop created successfully!');
-        form.resetFields();
-      },
-      onError: (err: any) => {
-        console.error(err);
-        message.error('❌ Failed to create Airdrop. Please try again!');
-      },
-    });
+    console.log('🚀 Payload to update:', payload);
+    updateAirdropPost(
+      { id: selectAirdropPost.id, obj: payload },
+      {
+        onSuccess: () => {
+          message.success('✅ Airdrop post updated successfully!');
+          router.push('/admin/airdrop-post');
+        },
+        onError: (err: any) => {
+          console.error(err);
+          message.error('❌ Failed to update Airdrop post.');
+        },
+      }
+    );
   };
 
-  const handleUploadChange = (info: any) => {
-    if (info.file.status === 'done') {
-      message.success('Upload ảnh thành công!');
-    } else if (info.file.status === 'error') {
-      message.error('Upload ảnh thất bại!');
-    }
-  };
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-900">
-        Create Post Airdrop
+        Edit Airdrop Post
       </h1>
 
       <div className="mt-4 p-6 bg-white rounded-lg shadow-md">
@@ -81,18 +103,25 @@ export default function Page() {
           <Form.Item label="Status" name="status">
             <Select placeholder="Select status (optional)" allowClear>
               <Select.Option value="Closed">Closed</Select.Option>
-              <Select.Option value="Compeleted">Compeleted</Select.Option>
+              <Select.Option value="Completed">Completed</Select.Option>
             </Select>
           </Form.Item>
 
+          {/* 🟢 DATE */}
           <Form.Item label="Date" name="date">
             <Input type="date" placeholder="Select date (optional)" />
           </Form.Item>
 
-          <Form.Item label="Hide" name="hide">
+          {/* 🟢 visibility */}
+          <Form.Item
+            label="Visibility"
+            name="Visibility"
+            valuePropName="checked"
+          >
             <Switch />
           </Form.Item>
 
+          {/* 🟢 AIRDROP */}
           <Form.Item
             label="Airdrop"
             name="airdrop"
@@ -137,16 +166,21 @@ export default function Page() {
             //         : Promise.resolve(),
             //   },
             // ]}
-            getValueFromEvent={(content) => content}
+            // getValueFromEvent={(content) => content}
           >
             <TinyEditor />
           </Form.Item>
 
-          {/* 🟢 SUBMIT BUTTON */}
+          {/* 🟢 BUTTONS */}
           <Form.Item label=" ">
-            <Button type="primary" htmlType="submit">
-              Create
-            </Button>
+            <div className="flex gap-2">
+              <Button type="primary" htmlType="submit">
+                Save Changes
+              </Button>
+              <Button onClick={() => router.push('/airdrop/posts')}>
+                Cancel
+              </Button>
+            </div>
           </Form.Item>
         </Form>
       </div>

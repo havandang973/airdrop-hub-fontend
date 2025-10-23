@@ -146,7 +146,7 @@ export default function AirdropDetailPage() {
                         <IconPointFilled
                           size={18}
                           className={
-                            post.status === 'Completed'
+                            post.status === 'Compeleted'
                               ? 'text-green-500'
                               : 'text-red-500'
                           }

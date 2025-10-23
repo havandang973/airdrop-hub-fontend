@@ -1,6 +1,6 @@
 import { callApi } from "@/lib/http";
 
-export const deleteAirdrop = async (id: number) => {
-    const { data } = await callApi.delete(`/airdrop/${id}`);
+export const deleteFund = async (id: number) => {
+    const { data } = await callApi.delete(`/funds/${id}`);
     return data;
 };

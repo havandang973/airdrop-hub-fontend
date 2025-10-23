@@ -1,5 +1,5 @@
 'use client';
-import { Flex, Table, Tag } from 'antd';
+import { Flex, Table, Tag, Image } from 'antd';
 import { Button } from '@heroui/button';
 import { Link } from '@heroui/link';
 import {
@@ -16,72 +16,54 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import { useState } from 'react';
-import { useDeleteAirdropPost, useGetAirdropPosts } from '@/lib/hooks/airdrop';
+import { useDeleteFund, useGetFunds } from '@/lib/hooks/fund';
 
-export default function Page() {
-  const { data: posts, isLoading } = useGetAirdropPosts();
-  const { mutate: deletePost, isPending } = useDeleteAirdropPost();
+export default function FundsPage() {
+  const { data: funds, isLoading } = useGetFunds();
+  const { mutate: deleteFund, isPending } = useDeleteFund();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const handleDelete = () => {
     if (!selectedId) return;
-    deletePost(selectedId, {
-      onSuccess: () => {
-        console.log('✅ Post deleted successfully');
-      },
-      onError: (err: any) => {
-        console.error('❌ Failed to delete post:', err);
-      },
+    deleteFund(selectedId, {
+      onSuccess: () => console.log('✅ Fund deleted successfully'),
+      onError: (err: any) => console.error('❌ Failed to delete fund:', err),
     });
   };
 
   const columns = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      width: 70,
-    },
-    {
-      title: 'Title',
+      title: 'Fund',
       dataIndex: 'name',
       key: 'name',
-      render: (text: string, record: any) => (
+      render: (_: string, record: any) => (
         <Flex align="center" gap={10}>
-          <span className="font-medium">{text}</span>
+          <img
+            src={record.logo}
+            alt={record.name}
+            className="w-8 h-8 rounded-full object-cover"
+          />
+          <span className="font-medium">{record.name}</span>
         </Flex>
       ),
     },
     {
-      title: 'Airdrop',
-      dataIndex: ['airdrop', 'title'],
-      key: 'airdrop',
-      render: (_: any, record: any) => (
-        <Link
-          href={`/admin/airdrops/edit/${record?.airdrop?.id}`}
-          className="text-blue-600 text-sm"
-        >
-          {record?.airdrop?.name || '—'}
-        </Link>
+      title: 'Slug',
+      dataIndex: 'slug',
+      key: 'slug',
+      render: (slug: string) => (
+        <span className="text-gray-500 text-sm">{slug}</span>
       ),
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => (
-        <Tag color={status === 'active' ? 'green' : 'volcano'}>
-          {status?.toUpperCase()}
-        </Tag>
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      render: (text: string) => (
+        <span className="text-gray-600 text-sm line-clamp-1">{text}</span>
       ),
-    },
-    {
-      title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
-      render: (v: string) => (v ? new Date(v).toLocaleDateString() : '—'),
     },
     {
       title: 'Created At',
@@ -90,12 +72,18 @@ export default function Page() {
       render: (v: string) => new Date(v).toLocaleDateString(),
     },
     {
+      title: 'Updated At',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      render: (v: string) => new Date(v).toLocaleDateString(),
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (_: any, record: any) => (
         <Flex gap={10}>
           <Button variant="light" size="sm" className="!min-w-8 !h-8 !p-0">
-            <Link href={`/admin/airdrop-posts/edit/${record.id}`}>
+            <Link href={`/admin/funds/edit/${record.id}`}>
               <IconPencil size={16} />
             </Link>
           </Button>
@@ -118,14 +106,12 @@ export default function Page() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-gray-900 mb-4">
-        Airdrop Posts
-      </h1>
+      <h1 className="text-2xl font-semibold text-gray-900 mb-4">Funds</h1>
 
       <div className="p-6 bg-white rounded-lg shadow-md">
         <Table
           columns={columns}
-          dataSource={posts || []}
+          dataSource={funds || []}
           loading={isLoading}
           rowKey="id"
           pagination={{ pageSize: 10 }}
@@ -144,11 +130,11 @@ export default function Page() {
             <>
               <ModalHeader className="flex items-center gap-1">
                 <IconExclamationCircleFilled className="text-red-500" />
-                Delete Post
+                Delete Fund
               </ModalHeader>
               <ModalBody>
                 <span className="text-sm font-normal text-gray-500">
-                  Are you sure you want to delete this post? This action cannot
+                  Are you sure you want to delete this fund? This action cannot
                   be undone.
                 </span>
               </ModalBody>
@@ -162,7 +148,7 @@ export default function Page() {
                     handleDelete();
                     onClose();
                   }}
-                  // isLoading={isPending}
+                  isLoading={isPending}
                 >
                   Delete
                 </Button>
