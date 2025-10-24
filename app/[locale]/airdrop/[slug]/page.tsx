@@ -137,7 +137,9 @@ export default function AirdropDetailPage() {
                     if (el)
                       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }}
-                  className="!border-gray-200 border transition-all hover:!border-blue-400"
+                  className={`!border-gray-200 border transition-all hover:!border-blue-400 ${
+                    post.status === 'Closed' ? 'opacity-50' : ''
+                  }`}
                 >
                   <div className="flex flex-col gap-2">
                     <h3 className="font-semibold text-lg">{post.name}</h3>
@@ -146,7 +148,7 @@ export default function AirdropDetailPage() {
                         <IconPointFilled
                           size={18}
                           className={
-                            post.status === 'Compeleted'
+                            post.status === 'Open'
                               ? 'text-green-500'
                               : 'text-red-500'
                           }
@@ -171,7 +173,9 @@ export default function AirdropDetailPage() {
                 <div
                   key={post.id}
                   id={`post-${post.id}`}
-                  className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm scroll-mt-24"
+                  className={`bg-white p-5 rounded-xl border border-gray-200 shadow-sm scroll-mt-24 ${
+                    post.status === 'Closed' ? 'opacity-50' : ''
+                  }`}
                 >
                   <h2 className="text-xl font-semibold mb-3">{post.name}</h2>
                   <div

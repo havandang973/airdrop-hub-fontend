@@ -16,8 +16,9 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { useCryptoMarquee } from './cryptoMarquee';
 import Script from 'next/script';
+import Home from './(components)/Home';
 
-export default function Home() {
+export default function Page() {
   useCryptoWidget();
   const theme =
     typeof window !== 'undefined'
@@ -28,7 +29,7 @@ export default function Home() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row items-center md:items-start md:justify-between mx-auto">
+      {/* <div className="flex flex-col md:flex-row items-center md:items-start md:justify-between mx-auto">
         <div className="text-center md:text-left md:max-w-xl">
           <span
             className={title({
@@ -84,8 +85,8 @@ export default function Home() {
             className="w-64 md:w-96"
           />
         </div>
-      </div>
-
+      </div> */}
+      <Home />
       <div
         className="binance-widget-marquee"
         data-cmc-ids="1,1027,52,5426,74,2010,20947,825,1839,1975,5805,1958"
