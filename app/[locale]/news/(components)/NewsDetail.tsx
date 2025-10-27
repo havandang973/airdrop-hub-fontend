@@ -7,47 +7,50 @@ import Image from 'next/image';
 import { useGetPost, useGetPosts } from '@/lib/hooks/post';
 import { useParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function NewsDetailPage() {
   const locale = useLocale();
   const params = useParams() as { params?: string[] };
-  const slug =
-    params?.params && params?.params?.length > 1
-      ? params?.params?.[1]
-      : params?.params?.[0]; // ✅ Bắt slug từ mảng params
 
-  console.log('🚀 ~ file: NewsDetail.tsx:25 ~ slug:', params);
-  const { data: article, isLoading } = useGetPost(slug as string, !!slug);
-  const { data: recentPosts } = useGetPosts(true);
-  const [post, setPost] = useState<any | null>(article);
-
-  useEffect(() => {
-    setPost(article);
-  }, [article]);
-
-  if (!slug) {
-    // ✅ Nếu không có slug → hiển thị trang danh sách
-    return (
-      <div className="text-center py-20 text-gray-500">
-        <p>Chọn một bài viết để xem chi tiết.</p>
-      </div>
-    );
-  }
-
-  if (isLoading)
+  // ✅ Nếu params chưa sẵn sàng thì return null để tránh lỗi
+  if (!params || !params.params) {
     return (
       <div className="flex justify-center items-center h-[400px]">
         <Spin size="large" />
       </div>
     );
+  }
 
-  if (!article)
+  const slug = params.params.length > 1 ? params.params[1] : params.params[0];
+
+  const { data: article, isLoading } = useGetPost(slug, !!slug);
+  const { data: recentPosts } = useGetPosts(true);
+  const [post, setPost] = useState<any | null>(null);
+
+  useEffect(() => {
+    if (!isLoading && article) {
+      setPost(article);
+    }
+  }, [article, isLoading]);
+
+  // ✅ Nếu đang load hoặc chưa có slug
+  if (isLoading || !slug) {
     return (
-      <div className="text-center py-20 text-gray-500">
-        <p>Bài viết không tồn tại hoặc đã bị xóa.</p>
+      <div className="flex justify-center items-center h-[400px]">
+        <Spin size="large" />
       </div>
     );
+  }
+
+  // ✅ Nếu không tìm thấy bài viết
+  if (!post) {
+    return (
+      <div className="flex justify-center items-center h-[400px]">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -77,7 +80,7 @@ export default function NewsDetailPage() {
           )}
         </div>
 
-        {post.thumbnail && (
+        {/* {post.thumbnail && (
           <Image
             src={post.thumbnail}
             alt={post.title}
@@ -85,10 +88,10 @@ export default function NewsDetailPage() {
             height={400}
             className="rounded-xl mb-6 object-cover"
           />
-        )}
+        )} */}
 
         <div
-          className="text-gray-800 leading-relaxed"
+          className="prose prose-sm max-w-none"
           dangerouslySetInnerHTML={{ __html: post.content || '' }}
         />
 
@@ -135,7 +138,11 @@ export default function NewsDetailPage() {
               />
               <div className="flex-1">
                 <Link
-                  href={`/${locale}/news/${post.slug}`}
+                  href={
+                    post.category?.name
+                      ? `/news/${post.category.name}/${post.slug}` // có category
+                      : `/news/${post.slug}` // không có category
+                  }
                   className="font-medium text-sm hover:text-blue-600 line-clamp-2"
                 >
                   {post.title}

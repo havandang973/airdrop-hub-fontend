@@ -89,15 +89,11 @@ export default function SidebarLayout({
       children: [
         {
           label: 'List',
-          href: '/admin/airdrop',
+          href: '/admin/news',
         },
         {
           label: 'Create',
-          href: '/admin/airdrop/create',
-        },
-        {
-          label: 'Edit',
-          href: '/admin/airdrop/edit',
+          href: '/admin/news/create',
         },
       ],
     },

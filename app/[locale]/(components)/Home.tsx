@@ -1,139 +1,121 @@
 'use client';
-import { useState } from 'react';
-import { Carousel, ConfigProvider } from 'antd';
 import Image from 'next/image';
+import { Carousel, ConfigProvider } from 'antd';
 import { Divider } from '@heroui/divider';
-
-const heroPosts = [
-  {
-    id: 1,
-    title:
-      'Phân Tích CreatorDAO: Khi Con Người Có Thể Trở Thành Tài Sản Đầu Tư',
-    image:
-      'https://hakresearch.com/wp-content/uploads/2025/09/Phan-tich-Pudgy-Party_-Co-hoi-va-cach-kiem-tien.jpg',
-  },
-  {
-    id: 2,
-    title: 'Phân Tích Meteora: Thông Tin Cần Biết Khi TGE Đã Đến Gần',
-    image:
-      'https://hakresearch.com/wp-content/uploads/photos/shares/phan-tich-meteora-thong-tin-can-biet-khi-tge-da-den-gan/1760775336_meteora.jpg',
-  },
-  {
-    id: 3,
-    title:
-      'Tổng Giám Đốc Redstone Oracle: Mọi Xu Hướng Lớn Phụ Thuộc Vào Oracle',
-    image:
-      'https://hakresearch.com/wp-content/uploads/photos/shares/phan-tich-meme-rush-don-bay-tao-nen-meme-season-tren-bnb-chain/1760709592_binance%20wallet.png',
-  },
-  {
-    id: 4,
-    title: 'Concero Hợp Tác Với Pharos Network: Mở Khóa Khả Năng Tương...',
-    image:
-      'https://hakresearch.com/wp-content/uploads/2025/09/concero-pharos.png',
-  },
-  {
-    id: 5,
-    title: 'Giám Đốc Công Nghệ Pendle: “Tham Vọng Của Pendle Với Boros...”',
-    image:
-      'https://hakresearch.com/wp-content/uploads/2025/09/Screenshot-2025-09-27-150005.png',
-  },
-];
-
-const newsPosts = [
-  {
-    id: 1,
-    title: 'RedStone Mua Lại Credora: Bước Tiến Chiến Lược Trong Đánh Giá...',
-    image:
-      'https://hakresearch.com/wp-content/uploads/2025/09/Screenshot-2025-09-08-152329.png',
-  },
-  {
-    id: 2,
-    title: 'Concero Hợp Tác Với Pharos Network: Mở Khóa Khả Năng Tương...',
-    image:
-      'https://hakresearch.com/wp-content/uploads/2025/09/concero-pharos.png',
-  },
-  {
-    id: 3,
-    title: 'Backpack EU Chính Thức Ra Mắt, Cung Cấp Giao Dịch Hợp Đồng...',
-    image:
-      'https://hakresearch.com/wp-content/uploads/2025/09/Screenshot-2025-09-27-153230.png',
-  },
-  {
-    id: 4,
-    title: 'Giám Đốc Công Nghệ Pendle: “Tham Vọng Của Pendle Với Boros...”',
-    image:
-      'https://hakresearch.com/wp-content/uploads/2025/09/Screenshot-2025-09-27-150005.png',
-  },
-];
+import { useGetPosts } from '@/lib/hooks/post';
+import { Link } from '@heroui/link';
 
 export default function Home() {
+  const { data, isLoading } = useGetPosts();
+  const posts = data ?? [];
+
+  // ✅ Lọc bài viết
+  const heroPosts: any = posts
+    .filter((p) => p.pin_to_home && !p.pin)
+    .slice(0, 5);
+  const carouselPosts = posts
+    .filter((p) => p.pin || p.pin_to_home)
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    ); // sắp xếp bài mới nhất lên đầu
+
+  if (isLoading) return <div>Loading...</div>;
+  console.log('heroPosts', heroPosts);
   return (
     <div className="container mx-auto space-y-8">
       {/* Hero section */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        {/* Bài lớn */}
-        <div className="md:col-span-3 relative rounded-2xl overflow-hidden">
-          <Image
-            src={heroPosts[0].image}
-            alt={heroPosts[0].title}
-            width={800}
-            height={400}
-            className="object-cover w-full h-[400px]"
-          />
-          <div className="w-full absolute bottom-0 p-6 bg-gradient-to-t from-black/80 to-transparent text-white">
-            <h2 className="text-2xl font-semibold">{heroPosts[0].title}</h2>
+      {heroPosts.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {/* Bài lớn */}
+          <Link
+            href={
+              heroPosts.category?.name
+                ? `/news/${heroPosts.category.name}/${heroPosts.slug}` // có category
+                : `/news/${heroPosts.slug}` // không có category
+            }
+            key={heroPosts.id}
+            className="md:col-span-3 relative rounded-2xl overflow-hidden"
+          >
+            <Image
+              src={heroPosts[0].thumbnail}
+              alt={heroPosts[0].title}
+              width={800}
+              height={400}
+              className="object-cover w-full h-[400px]"
+            />
+            <div className="w-full absolute bottom-0 p-6 bg-gradient-to-t from-black/80 to-transparent text-white">
+              <h2 className="text-2xl font-semibold">{heroPosts[0].title}</h2>
+            </div>
+          </Link>
+
+          {/* 4 bài nhỏ */}
+          <div className="grid grid-cols-2 md:col-span-2 gap-4 w-full">
+            {heroPosts.slice(1, 5).map((post: any) => (
+              <Link
+                href={
+                  post.category?.name
+                    ? `/news/${post.category.name}/${post.slug}` // có category
+                    : `/news/${post.slug}` // không có category
+                }
+                key={post.id}
+                className="relative rounded-2xl overflow-hidden"
+              >
+                <Image
+                  src={post.thumbnail}
+                  alt={post.title}
+                  width={400}
+                  height={200}
+                  className="object-cover w-full h-[190px]"
+                />
+                <div className="w-full absolute bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
+                  <h3 className="text-sm font-medium">{post.title}</h3>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
-
-        {/* 4 bài nhỏ (2 hàng x 2 cột) */}
-        <div className="grid grid-cols-2 md:col-span-2 gap-4 w-full">
-          {heroPosts.slice(1, 5).map((post) => (
-            <div key={post.id} className="relative rounded-2xl overflow-hidden">
-              <Image
-                src={post.image}
-                alt={post.title}
-                width={400}
-                height={200}
-                className="object-cover w-full h-[190px]"
-              />
-              <div className="w-full absolute bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
-                <h3 className="text-sm font-medium">{post.title}</h3>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
 
       <Divider />
-      {/* News carousel */}
-      <div className="mb-2">
+
+      {/* Carousel */}
+      {carouselPosts.length > 0 && (
         <ConfigProvider
           theme={{
             components: {
               Carousel: {
-                arrowSize: 30, // 🔹 to mũi tên
-                arrowOffset: 20, // 🔹 cách mép
-                dotHeight: 5, // 🔹 chiều cao chấm
-                dotWidth: 20, // 🔹 chiều rộng chấm
-                dotGap: 8, // 🔹 khoảng cách giữa các chấm
-                dotActiveWidth: 32, // 🔹 chấm active to hơn
+                arrowSize: 30,
+                arrowOffset: 20,
+                dotHeight: 5,
+                dotWidth: 20,
+                dotGap: 8,
+                dotActiveWidth: 32,
               },
             },
           }}
         >
           <Carousel
-            dots={true}
+            dots
             slidesToShow={4}
             slidesToScroll={1}
             arrows
             infinite
             autoplay
           >
-            {newsPosts.map((post) => (
-              <div key={post.id} className="px-2 pb-2">
+            {carouselPosts.map((post) => (
+              <Link
+                href={
+                  post.category?.name
+                    ? `/news/${post.category.name}/${post.slug}` // có category
+                    : `/news/${post.slug}` // không có category
+                }
+                key={post.id}
+                className="px-2 pb-2"
+              >
                 <div className="rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-200">
                   <Image
-                    src={post.image}
+                    src={post.thumbnail}
                     alt={post.title}
                     width={400}
                     height={200}
@@ -143,24 +125,24 @@ export default function Home() {
                     <h4 className="font-semibold text-base">{post.title}</h4>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </Carousel>
           <style jsx global>{`
             .ant-carousel .slick-dots li button {
-              background: #d1d5db !important; /* màu dot thường (xám nhạt) */
+              background: #d1d5db !important;
               opacity: 1 !important;
             }
             .ant-carousel .slick-dots li.slick-active::after {
-              background: #006fee !important; /* màu dot active (HeroUI tím) */
+              background: #006fee !important;
               border-radius: 8px !important;
             }
             .ant-carousel .slick-dots-bottom {
-              bottom: -20px !important; /* đẩy dots xuống dưới */
+              bottom: -20px !important;
             }
           `}</style>
         </ConfigProvider>
-      </div>
+      )}
     </div>
   );
 }

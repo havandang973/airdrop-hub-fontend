@@ -1,17 +1,16 @@
 'use client';
 
+import { useParams } from 'next/navigation';
 import NewsList from '../(components)/NewList';
 import NewsDetail from '../(components)/NewsDetail';
 
-export default function NewsPage({
-  params,
-}: {
-  params: { params?: string[] };
-}) {
-  const { params: routeParams } = params;
+export default function NewsPage() {
+  const params = useParams() as { locale: string; params?: string[] };
 
+  console.log(params);
   // /vi/news -> không có params => trang danh sách
-  if (!routeParams || routeParams.length === 0) {
+  if (!params?.params || params?.params?.length === 0) {
+    console.log('ok');
     return <NewsList />;
   }
 
