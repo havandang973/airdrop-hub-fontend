@@ -1,84 +1,110 @@
 'use client';
+import { useEffect, useState } from 'react';
 import { IconPlus } from '@tabler/icons-react';
 import { Button, Form, Input, Select, Upload, message } from 'antd';
-import TextArea from 'antd/es/input/TextArea';
+import { useRouter, useParams } from 'next/navigation';
 import slugify from 'slugify';
-import { useRouter } from 'next/navigation';
-import { mutationCreateAirdrop } from '@/lib/hooks/airdrop';
-import { useGetFunds } from '@/lib/hooks/fund'; // Hook lấy danh sách Fund
-import TinyEditor from '../(components)/TinyEditor';
-import { Avatar } from '@heroui/avatar';
+import TextArea from 'antd/es/input/TextArea';
+import { mutationUpdateAirdrop, useGetAirdrop } from '@/lib/hooks/airdrop';
+import { useGetFunds } from '@/lib/hooks/fund'; // 🔹 import hook lấy danh sách fund
 
-export default function Page() {
-  const [form] = Form.useForm();
-  const { mutate: createAirdrop } = mutationCreateAirdrop();
-  const router = useRouter();
-
+export default function EditAirdropPage() {
   const CLOUD_NAME = 'dzdbaikqm';
   const UPLOAD_PRESET = 'upload_img';
+  const [form] = Form.useForm();
+  const router = useRouter();
+  const params = useParams();
+  const { mutate: updateAirdrop } = mutationUpdateAirdrop();
+  const { data: funds } = useGetFunds(); // 🔹 lấy tất cả fund
+  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+  const { data: airdrop, isLoading } = useGetAirdrop(slug as string, !!slug);
+  const [selectAirdrop, setSelectAirdrop] = useState<any>(null);
 
-  // 🔹 Lấy danh sách Fund
-  const { data: funds } = useGetFunds(); // trả về mảng {id, name}
+  useEffect(() => {
+    setSelectAirdrop(airdrop);
+  }, [airdrop]);
 
-  const handleUploadChange = (info: any) => {
-    if (info.file.status === 'done') message.success('Upload ảnh thành công!');
-    else if (info.file.status === 'error')
-      message.error('Upload ảnh thất bại!');
-  };
+  useEffect(() => {
+    if (!slug) return;
+    if (selectAirdrop) {
+      form.setFieldsValue({
+        name: selectAirdrop.name,
+        description: selectAirdrop.description,
+        status: selectAirdrop.status,
+        raise: selectAirdrop.raise,
+        date: selectAirdrop.date ? selectAirdrop.date.split('T')[0] : undefined,
+        logo: selectAirdrop.logo
+          ? [
+              {
+                uid: '-1',
+                name: 'logo.png',
+                status: 'done',
+                url: selectAirdrop.logo,
+              },
+            ]
+          : [],
+        // 🔹 Set fundIds hiện tại
+        fundIds: selectAirdrop.funds?.map((f: any) => f.id),
+      });
+    }
+  }, [slug, selectAirdrop, form]);
 
   const handleSubmit = (values: any) => {
     const slug = slugify(values.name, { lower: true });
-    const logoUrl = values.logo?.[0]?.response?.secure_url || '';
+    const logoUrl =
+      values.logo?.[0]?.response?.secure_url || values.logo?.[0]?.url || '';
 
     const payload = {
       name: values.name.trim(),
       slug,
       logo: logoUrl,
-      description: values.description || '',
+      description: values.description,
       status: values.status || null,
       raise: values.raise ? parseFloat(values.raise) : null,
-      date: values.date || null,
-      createdBy: 1, // thay bằng userId thật
-      fundIds: values.fundIds || [], // danh sách fundId
+      date: values.date ? new Date(values.date) : null,
+      fundIds: values.fundIds || [], // 🔹 gửi fundIds lên server
     };
 
-    console.log('📦 Payload gửi đi:', payload);
+    updateAirdrop(
+      { id: selectAirdrop.id, obj: payload },
+      {
+        onSuccess: () => {
+          message.success('Airdrop updated successfully!');
+          router.push('/admin/airdrop');
+        },
+        onError: () => {
+          message.error('Failed to update Airdrop!');
+        },
+      }
+    );
+  };
 
-    createAirdrop(payload, {
-      onSuccess: () => {
-        message.success('Airdrop created successfully!');
-        form.resetFields();
-        router.push('/admin/airdrop');
-      },
-      onError: (err: any) => {
-        console.error(err);
-        message.error('Failed to create Airdrop.');
-      },
-    });
+  const handleUploadChange = (info: any) => {
+    if (info.file.status === 'done') {
+      message.success('Upload ảnh thành công!');
+    } else if (info.file.status === 'error') {
+      message.error('Upload ảnh thất bại!');
+    }
   };
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-gray-900">Create Airdrop</h1>
+      <h1 className="text-2xl font-semibold text-gray-900">Edit Airdrop</h1>
       <div className="mt-4 p-6 bg-white rounded-lg shadow-md">
         <Form
           form={form}
           layout="horizontal"
           labelCol={{ flex: '110px' }}
+          labelAlign="left"
           wrapperCol={{ flex: 1 }}
           colon={false}
           onFinish={handleSubmit}
         >
-          {/* Name */}
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: 'Please enter a name!' }]}
-          >
-            <Input placeholder="Enter Airdrop title" />
+          {/* Các field cũ giữ nguyên */}
+          <Form.Item label="Name" name="name" rules={[{ required: true }]}>
+            <Input placeholder="Enter Airdrop name" />
           </Form.Item>
 
-          {/* Logo */}
           <Form.Item
             label="Logo"
             name="logo"
@@ -103,34 +129,27 @@ export default function Page() {
             </Upload>
           </Form.Item>
 
-          {/* Description */}
           <Form.Item
             label="Description"
             name="description"
-            // rules={[{ required: true, message: 'Please enter description!' }]}
+            // rules={[{ required: true }]}
           >
             <TextArea rows={4} placeholder="Enter description" />
           </Form.Item>
 
-          {/* Status */}
           <Form.Item label="Status" name="status">
-            <Select placeholder="Select status (optional)" allowClear>
+            <Select placeholder="Select status">
               <Select.Option value="active">Active</Select.Option>
               <Select.Option value="inactive">Inactive</Select.Option>
             </Select>
           </Form.Item>
 
-          {/* Raise */}
           <Form.Item label="Raise" name="raise">
-            <Input
-              type="number"
-              placeholder="Enter total raise amount (optional)"
-            />
+            <Input type="number" placeholder="Enter total raise amount" />
           </Form.Item>
 
-          {/* Date */}
           <Form.Item label="Date" name="date">
-            <Input type="date" placeholder="Select date (optional)" />
+            <Input type="date" />
           </Form.Item>
 
           <Form.Item label="Funds" name="fundIds">
@@ -139,7 +158,7 @@ export default function Page() {
               placeholder="Select funds"
               allowClear
               showSearch
-              optionLabelProp="label" // hiển thị label trong tag khi chọn
+              optionLabelProp="label" // dùng label string để hiển thị tag
               filterOption={(input, option: any) =>
                 option.label.toLowerCase().includes(input.toLowerCase())
               }
@@ -148,7 +167,7 @@ export default function Page() {
                 <Select.Option
                   key={f.id}
                   value={f.id}
-                  label={f.name} // 🔹 label là string để search và hiển thị trong tag
+                  label={f.name} // 🔹 label string, tag hiển thị text
                 >
                   <div className="flex items-center gap-2">
                     <img
@@ -163,10 +182,15 @@ export default function Page() {
             </Select>
           </Form.Item>
 
-          {/* Submit */}
           <Form.Item label=" ">
             <Button type="primary" htmlType="submit">
-              Create
+              Update
+            </Button>
+            <Button
+              className="ml-2"
+              onClick={() => router.push('/admin/airdrop')}
+            >
+              Cancel
             </Button>
           </Form.Item>
         </Form>

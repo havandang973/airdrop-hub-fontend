@@ -9,6 +9,8 @@ import { getAirdropPost } from "../api/airdrop/getAirdropPost";
 import { getAirdropPosts } from "../api/airdrop/getAirdropPosts";
 import { createAirdropPost } from "../api/airdrop/createAirdropPost";
 import { deleteAirdropPost } from "../api/airdrop/deleteAirdropPost";
+import { updateAirdropPost } from "../api/airdrop/updateAirdropPost";
+import { getAirdropPostDetail } from "../api/airdrop/getAirdropPostDetail";
 
 export const useGetAirdrops = (enabled?: boolean) => {
   return useQuery({
@@ -36,6 +38,17 @@ export const useGetAirdropPost = (id: number, enabled: boolean) => {
   return useQuery({
     queryKey: ['airdrop-post', id, appConfig.version],
     queryFn: () => getAirdropPost(id),
+    enabled,
+    refetchIntervalInBackground: true,
+    staleTime: 0,
+    refetchInterval: 15_000,
+  });
+};
+
+export const useGetAirdropPostDetail = (id: number, enabled: boolean) => {
+  return useQuery({
+    queryKey: ['airdrop-post-detail', id, appConfig.version],
+    queryFn: () => getAirdropPostDetail(id),
     enabled,
     refetchIntervalInBackground: true,
     staleTime: 0,
@@ -76,7 +89,16 @@ export function mutationCreateAirdropPost() {
 export function mutationUpdateAirdrop() {
   return useMutation({
     mutationKey: ['update-airdrop'],
-    mutationFn: ({ slug, obj }: { slug: string; obj: object }) => updateAirdrop(obj, slug),
+    mutationFn: ({ id, obj }: { id: number; obj: object }) => updateAirdrop(obj, id),
+    onSuccess: () => {
+    },
+  });
+}
+
+export function mutationUpdateAirdropPost() {
+  return useMutation({
+    mutationKey: ['update-airdrop-post'],
+    mutationFn: ({ id, obj }: { id: number; obj: object }) => updateAirdropPost(obj, id),
     onSuccess: () => {
     },
   });

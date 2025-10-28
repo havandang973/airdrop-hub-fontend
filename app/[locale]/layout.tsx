@@ -84,7 +84,7 @@ export default function RootLayout({
                   src="https://cdn.24h.com.vn/upload/3-2025/images/2025-07-10/html5_banner_thuong_1752133372_55/1752133372_index.html?cID=45&amp;pos=140&amp;1759198585058"
                 ></iframe> */}
 
-                <div className="flex-1 max-w-screen-2xl container mx-auto pt-16 md:px-6 px-2 flex-grow">
+                <div className="flex-1 max-w-screen-2xl container mx-auto pt-8 md:px-6 px-2 flex-grow">
                   {children}
                 </div>
 

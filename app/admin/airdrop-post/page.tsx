@@ -95,7 +95,7 @@ export default function Page() {
       render: (_: any, record: any) => (
         <Flex gap={10}>
           <Button variant="light" size="sm" className="!min-w-8 !h-8 !p-0">
-            <Link href={`/admin/airdrop-posts/edit/${record.id}`}>
+            <Link href={`/admin/airdrop-post/edit/${record.id}`}>
               <IconPencil size={16} />
             </Link>
           </Button>

@@ -50,10 +50,6 @@ export default function SidebarLayout({
           label: 'Create',
           href: '/admin/airdrop/create',
         },
-        {
-          label: 'Edit',
-          href: '/admin/airdrop/edit',
-        },
       ],
     },
     {
@@ -68,10 +64,6 @@ export default function SidebarLayout({
         {
           label: 'Create',
           href: '/admin/airdrop-post/create',
-        },
-        {
-          label: 'Edit',
-          href: '/admin/airdrop-post/edit',
         },
       ],
     },
@@ -88,10 +80,6 @@ export default function SidebarLayout({
           label: 'Create',
           href: '/admin/funds/create',
         },
-        {
-          label: 'Edit',
-          href: '/admin/funds/edit',
-        },
       ],
     },
     {
@@ -101,15 +89,11 @@ export default function SidebarLayout({
       children: [
         {
           label: 'List',
-          href: '/admin/airdrop',
+          href: '/admin/news',
         },
         {
           label: 'Create',
-          href: '/admin/airdrop/create',
-        },
-        {
-          label: 'Edit',
-          href: '/admin/airdrop/edit',
+          href: '/admin/news/create',
         },
       ],
     },

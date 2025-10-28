@@ -3,12 +3,15 @@ import { Editor } from '@tinymce/tinymce-react';
 
 export default function TinyEditor({
   onChange,
+  value,
 }: {
   onChange?: (content: string) => void;
+  value?: string;
 }) {
   return (
     <Editor
       apiKey="gdodu3mdloaydidzg3n4ss8oeht5nr3abzurx0k56rh3x2ef"
+      value={value}
       onEditorChange={(content: any) => {
         if (onChange) onChange(content);
       }}
@@ -27,34 +30,6 @@ export default function TinyEditor({
           'table',
           'visualblocks',
           'wordcount',
-          // Your account includes a free trial of TinyMCE premium features
-          // Try the most popular premium features until Oct 27, 2025:
-          'checklist',
-          'mediaembed',
-          'casechange',
-          'formatpainter',
-          'pageembed',
-          'a11ychecker',
-          'tinymcespellchecker',
-          'permanentpen',
-          'powerpaste',
-          'advtable',
-          'advcode',
-          'advtemplate',
-          'ai',
-          'uploadcare',
-          'mentions',
-          'tinycomments',
-          'tableofcontents',
-          'footnotes',
-          'mergetags',
-          'autocorrect',
-          'typography',
-          'inlinecss',
-          'markdown',
-          'importword',
-          'exportword',
-          'exportpdf',
         ],
 
         toolbar:
@@ -71,7 +46,6 @@ export default function TinyEditor({
           ),
         uploadcare_public_key: 'dc99983c438546c2fafc',
       }}
-      initialValue="Welcome to TinyMCE!"
     />
   );
 }

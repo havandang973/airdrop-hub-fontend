@@ -1,9 +1,33 @@
+
 import { defineRouting } from 'next-intl/routing';
 
 export const routing = defineRouting({
-    // A list of all locales that are supported
     locales: ['en', 'vi'],
+    defaultLocale: 'en',
+    localePrefix: 'always',
 
-    // Used when no locale matches
-    defaultLocale: 'vi'
+    // 🔥 Dịch đường dẫn ở đây:
+    pathnames: {
+        '/news': {
+            en: '/news',
+            vi: '/tin-tuc',
+        },
+        '/news/[...params]': {
+            vi: '/tin-tuc/[...params]',
+            en: '/news/[...params]'
+        },
+        '/funds': {
+            en: '/funds',
+            vi: '/quy-dau-tu',
+        },
+        '/market': {
+            en: '/market',
+            vi: '/thi-truong',
+        },
+        '/airdrop': {
+            en: '/airdrop',
+            vi: '/airdrop',
+        },
+    },
 });
+

@@ -117,6 +117,7 @@ export const Navbar = () => {
       // className="dark:bg-gray-900 bg-white fixed top-0 left-0 w-full z-50"
       onMenuOpenChange={(open) => setOpen(open)}
       isMenuOpen={open}
+      className="shadow-sm  dark:bg-gray-900"
     >
       <NavbarContent className="basis-1/5 sm:basis-full " justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
