@@ -1,6 +1,6 @@
 import { callApi } from "@/lib/http";
 
-export const getPosts = async (): Promise<any[]> => {
-    const { data } = await callApi.get('/posts');
+export const getPosts = async (category?: string): Promise<any[]> => {
+    const { data } = await callApi.get('/posts?category=' + category);
     return data;
 };

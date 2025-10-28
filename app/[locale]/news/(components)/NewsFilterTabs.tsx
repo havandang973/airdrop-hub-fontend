@@ -1,18 +1,8 @@
 'use client';
-import { Tabs } from 'antd';
-import { IconNews, IconCoin, IconBook2, IconStack } from '@tabler/icons-react';
 
-const items = [
-  { key: 'all', label: 'Tất cả', icon: <IconStack size={18} /> },
-  { key: 'airdrop', label: 'Tin tức Airdrop', icon: <IconNews size={18} /> },
-  { key: 'crypto', label: 'Tin tức Crypto', icon: <IconCoin size={18} /> },
-  { key: 'nft', label: 'Tin tức NFT', icon: <IconBook2 size={18} /> },
-  {
-    key: 'research',
-    label: 'Nghiên cứu',
-    icon: <IconBook2 size={18} />,
-  },
-];
+import { Tabs, Spin } from 'antd';
+import { IconStack } from '@tabler/icons-react';
+import { useGetCategories } from '@/lib/hooks/category';
 
 export default function NewsFilterTabs({
   value,
@@ -21,15 +11,35 @@ export default function NewsFilterTabs({
   value: string;
   onChange: (val: string) => void;
 }) {
+  const { data: categories, isLoading } = useGetCategories();
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <Spin />
+      </div>
+    );
+  }
+
+  // 🟢 Mặc định luôn có tab "Tất cả"
+  const tabs = [
+    { key: 'all', label: 'Tất cả', icon: <IconStack size={18} /> },
+    ...(categories?.map((cat: any) => ({
+      key: cat.slug || cat.name, // dùng slug nếu có
+      label: cat.name,
+      icon: <IconStack size={18} />,
+    })) || []),
+  ];
+
   return (
     <Tabs
       centered
-      items={items.map((i) => ({
-        key: i.key,
+      items={tabs.map((item) => ({
+        key: item.key,
         label: (
           <div className="flex items-center gap-1">
-            {i.icon}
-            {i.label}
+            {item.icon}
+            {item.label}
           </div>
         ),
       }))}

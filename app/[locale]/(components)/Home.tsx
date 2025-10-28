@@ -6,7 +6,7 @@ import { useGetPosts } from '@/lib/hooks/post';
 import { Link } from '@heroui/link';
 
 export default function Home() {
-  const { data, isLoading } = useGetPosts();
+  const { data, isLoading } = useGetPosts(true, 'all');
   const posts = data ?? [];
 
   // ✅ Lọc bài viết

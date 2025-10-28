@@ -4,20 +4,20 @@ import { IconCalendar } from '@tabler/icons-react';
 
 export default function NewsCard({ post }: { post: any }) {
   return (
-    <div className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition">
-      <Image
-        src={post.image}
-        alt={post.title}
-        width={400}
-        height={220}
-        className="object-cover w-full h-[200px]"
-      />
-      <div className="p-3">
-        <h4 className="font-medium text-base line-clamp-2">{post.title}</h4>
-        <div className="flex items-center text-gray-500 text-sm mt-2">
-          <IconCalendar size={16} className="mr-1" />
-          {post.date}
-        </div>
+    <div className="bg-white rounded-lg overflow-hidden shadow hover:shadow-lg transition-all h-full flex flex-col">
+      <div className="aspect-[16/9] w-full overflow-hidden">
+        <img
+          src={post.image}
+          alt={post.title}
+          className="object-cover w-full h-full"
+        />
+      </div>
+
+      <div className="p-4 flex flex-col flex-grow">
+        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 mb-2">
+          {post.title}
+        </h3>
+        <p className="text-sm text-gray-500 mt-auto">{post.date}</p>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react';
 import {
   Table,
@@ -10,6 +11,12 @@ import {
   Popconfirm,
   message,
 } from 'antd';
+import {
+  mutationCreateTag,
+  mutationUpdateTag,
+  useDeleteTag,
+  useGetTags,
+} from '@/lib/hooks/tag';
 
 interface Tag {
   id: number;
@@ -18,19 +25,22 @@ interface Tag {
 
 export default function Page() {
   const [form] = Form.useForm();
-  const [categories, setCategories] = useState<Tag[]>([
-    { id: 1, name: 'Airdrop' },
-    { id: 2, name: 'Blockchain' },
-  ]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
 
-  // ✅ Open modal để tạo hoặc sửa
-  const openModal = (Tag?: Tag) => {
-    if (Tag) {
-      setEditingTag(Tag);
-      form.setFieldsValue(Tag);
+  // 🟢 Lấy danh sách tag
+  const { data: tags, isLoading, refetch } = useGetTags();
+
+  // 🟢 Mutation: create / update / delete
+  const createTag = mutationCreateTag();
+  const updateTag = mutationUpdateTag();
+  const deleteTag = useDeleteTag();
+
+  // ✅ Mở modal (create hoặc edit)
+  const openModal = (tag?: Tag) => {
+    if (tag) {
+      setEditingTag(tag);
+      form.setFieldsValue(tag);
     } else {
       setEditingTag(null);
       form.resetFields();
@@ -39,33 +49,36 @@ export default function Page() {
   };
 
   // ✅ Lưu (tạo hoặc cập nhật)
-  const handleOk = () => {
-    form.validateFields().then((values) => {
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+
       if (editingTag) {
-        // update
-        setCategories((prev) =>
-          prev.map((cat) =>
-            cat.id === editingTag.id ? { ...cat, ...values } : cat
-          )
-        );
+        // Cập nhật
+        await updateTag.mutateAsync({ id: editingTag.id, obj: values });
         message.success('Tag updated successfully');
       } else {
-        // create
-        const newTag = {
-          id: Date.now(),
-          ...values,
-        };
-        setCategories((prev) => [...prev, newTag]);
+        // Tạo mới
+        await createTag.mutateAsync(values);
         message.success('Tag created successfully');
       }
+
       setIsModalOpen(false);
-    });
+      refetch(); // reload lại danh sách
+    } catch (error) {
+      message.error('Something went wrong');
+    }
   };
 
   // ✅ Xóa
-  const handleDelete = (id: number) => {
-    setCategories((prev) => prev.filter((cat) => cat.id !== id));
-    message.success('Deleted successfully');
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteTag.mutateAsync(id);
+      message.success('Deleted successfully');
+      refetch();
+    } catch {
+      message.error('Failed to delete');
+    }
   };
 
   const columns = [
@@ -111,7 +124,13 @@ export default function Page() {
       </div>
 
       <div className="mt-4 p-6 bg-white rounded-lg shadow-md">
-        <Table columns={columns} dataSource={categories} rowKey="id" bordered />
+        <Table
+          columns={columns}
+          dataSource={tags || []}
+          rowKey="id"
+          bordered
+          loading={isLoading}
+        />
       </div>
 
       <Modal
@@ -128,9 +147,6 @@ export default function Page() {
             rules={[{ required: true, message: 'Please enter name' }]}
           >
             <Input placeholder="Tag name" />
-          </Form.Item>
-          <Form.Item label="Description" name="description">
-            <Input.TextArea placeholder="Description..." rows={3} />
           </Form.Item>
         </Form>
       </Modal>
