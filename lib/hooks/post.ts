@@ -7,10 +7,10 @@ import { updatePost } from "../api/post/updatePost";
 import { deletePost } from "../api/post/deletePost";
 
 // 🟩 Lấy danh sách tất cả bài viết
-export const useGetPosts = (enabled = true, category?: string) => {
+export const useGetPosts = (enabled = true, category?: string, visibility?: boolean) => {
     return useQuery({
         queryKey: ["posts", appConfig.version],
-        queryFn: () => getPosts(category),
+        queryFn: () => getPosts(category, visibility),
         enabled,
         refetchIntervalInBackground: true,
         staleTime: 0,

@@ -21,7 +21,7 @@ export default function NewsList({ hash }: { hash?: string }) {
     data: posts,
     isLoading,
     refetch,
-  } = useGetPosts(true, selectedCategory);
+  } = useGetPosts(true, selectedCategory, true);
 
   useEffect(() => {
     refetch();

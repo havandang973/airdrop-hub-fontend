@@ -25,7 +25,7 @@ export default function NewsDetailPage() {
   const slug = params.params.length > 1 ? params.params[1] : params.params[0];
 
   const { data: article, isLoading } = useGetPost(slug, !!slug);
-  const { data: recentPosts } = useGetPosts(true);
+  const { data: recentPosts } = useGetPosts(true, 'all');
   const [post, setPost] = useState<any | null>(null);
 
   useEffect(() => {
@@ -94,28 +94,6 @@ export default function NewsDetailPage() {
           className="prose prose-sm max-w-none"
           dangerouslySetInnerHTML={{ __html: post.content || '' }}
         />
-
-        <div className="mt-10 border-t pt-6 text-sm text-gray-600">
-          <p>
-            Mua bán USDT dễ dàng và an toàn tại sàn Aliniex. Môi trường giao
-            dịch đáng tin cậy và hiệu quả.
-          </p>
-          <p className="mt-3">Theo dõi các tin tức mới nhất tại:</p>
-          <ul className="list-disc list-inside text-blue-600">
-            <li>
-              <a href="https://t.me/Aliniex">Telegram Aliniex</a>
-            </li>
-            <li>
-              <a href="https://aliniex.com/tin-tuc">Trang tin tức</a>
-            </li>
-            <li>
-              <a href="https://aliniex.com/ho-tro">Trang khách hàng</a>
-            </li>
-          </ul>
-          <p className="mt-6 font-medium">
-            Tác giả: {post.createdByUser?.name || 'Ẩn danh'}
-          </p>
-        </div>
       </div>
 
       {/* SIDEBAR */}

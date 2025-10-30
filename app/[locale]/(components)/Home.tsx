@@ -21,7 +21,7 @@ export default function Home() {
     ); // sắp xếp bài mới nhất lên đầu
 
   if (isLoading) return <div>Loading...</div>;
-  console.log('heroPosts', heroPosts);
+
   return (
     <div className="container mx-auto space-y-8">
       {/* Hero section */}
@@ -30,9 +30,9 @@ export default function Home() {
           {/* Bài lớn */}
           <Link
             href={
-              heroPosts.category?.name
-                ? `/news/${heroPosts.category.name}/${heroPosts.slug}` // có category
-                : `/news/${heroPosts.slug}` // không có category
+              heroPosts[0].category?.name
+                ? `/news/${heroPosts[0].category.name}/${heroPosts[0].slug}` // có category
+                : `/news/${heroPosts[0].slug}` // không có category
             }
             key={heroPosts.id}
             className="md:col-span-3 relative rounded-2xl overflow-hidden"

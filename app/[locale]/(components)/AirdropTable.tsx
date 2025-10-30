@@ -91,7 +91,7 @@ const AirdropTable = () => {
       onCell: () => ({
         style: { fontWeight: 600 },
       }),
-      render: (text, record) => <span>{text}</span>,
+      render: (text, record) => <span>$ {text}M</span>,
     },
     {
       title: 'Status',
