@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { use, useState } from 'react';
 import clsx from 'clsx';
 import { fontSans } from '@/config/fonts';
 import { NextIntlClientProvider } from 'next-intl';
@@ -15,6 +15,9 @@ import {
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useLogout } from '@/lib/auth';
+import { Button } from '@heroui/button';
+import FooterAdmin from './(components)/FooterAdmin';
 
 export default function SidebarLayout({
   children,
@@ -118,6 +121,11 @@ export default function SidebarLayout({
       icon: <IconSettings size={20} />,
     },
   ];
+
+  const { mutate: logout } = useLogout();
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <div
@@ -236,17 +244,7 @@ export default function SidebarLayout({
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-800">
-          <div className="flex items-center">
-            <img
-              className="h-8 w-8 rounded-full"
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"
-              alt="User"
-            />
-            <div className="ml-3">
-              <p className="text-sm font-medium text-white">Tom Cook</p>
-              <p className="text-xs text-gray-400">View profile</p>
-            </div>
-          </div>
+          <FooterAdmin />
         </div>
       </aside>
 

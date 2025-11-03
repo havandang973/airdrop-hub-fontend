@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { callApi } from "@/lib/http";
 import { login } from "./api/auth/login";
+import { logout } from "./api/auth/logout";
 
 export const useLogin = () => {
     const queryClient = useQueryClient();
@@ -18,9 +19,7 @@ export const useLogout = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationKey: ["logout"],
-        mutationFn: async () => {
-            await callApi.post("/auth/logout");
-        },
+        mutationFn: () => logout(),
         onSuccess: () => {
             queryClient.setQueryData(["me"], null);
         },

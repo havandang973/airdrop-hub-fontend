@@ -76,8 +76,8 @@ export default function NewsList({ hash }: { hash?: string }) {
             key={post.id}
             href={
               post.category?.name
-                ? `/news/${post.category.name}/${post.slug}`
-                : `/news/${post.slug}`
+                ? `/${locale}/news/${post.category.name}/${post.slug}`
+                : `/${locale}/news/${post.slug}`
             }
           >
             <NewsCard

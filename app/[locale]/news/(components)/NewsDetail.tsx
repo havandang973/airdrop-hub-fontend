@@ -10,6 +10,7 @@ import { useLocale } from 'next-intl';
 import React, { useEffect, useState } from 'react';
 
 export default function NewsDetailPage() {
+  console.log('vaooooo');
   const locale = useLocale();
   const params = useParams() as { params?: string[] };
 
@@ -130,8 +131,8 @@ export default function NewsDetailPage() {
                       <Link
                         href={
                           post.category?.name
-                            ? `/news/${post.category.name}/${post.slug}`
-                            : `/news/${post.slug}`
+                            ? `/${locale}/news/${post.category.name}/${post.slug}`
+                            : `/${locale}/news/${post.slug}`
                         }
                         className="font-medium text-base hover:text-blue-600 line-clamp-2"
                       >

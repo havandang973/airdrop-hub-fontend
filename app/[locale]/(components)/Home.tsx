@@ -4,11 +4,12 @@ import { Carousel, ConfigProvider } from 'antd';
 import { Divider } from '@heroui/divider';
 import { useGetPosts } from '@/lib/hooks/post';
 import { Link } from '@heroui/link';
+import { useLocale } from 'next-intl';
 
 export default function Home() {
   const { data, isLoading } = useGetPosts(true, 'all');
   const posts = data ?? [];
-
+  const locale = useLocale();
   // ✅ Lọc bài viết
   const heroPosts: any = posts
     .filter((p) => p.pin_to_home && !p.pin)
@@ -31,8 +32,8 @@ export default function Home() {
           <Link
             href={
               heroPosts[0].category?.name
-                ? `/news/${heroPosts[0].category.name}/${heroPosts[0].slug}` // có category
-                : `/news/${heroPosts[0].slug}` // không có category
+                ? `/${locale}/news/${heroPosts[0].category.name}/${heroPosts[0].slug}` // có category
+                : `/${locale}/news/${heroPosts[0].slug}` // không có category
             }
             key={heroPosts.id}
             className="md:col-span-3 relative rounded-2xl overflow-hidden"
@@ -55,8 +56,8 @@ export default function Home() {
               <Link
                 href={
                   post.category?.name
-                    ? `/news/${post.category.name}/${post.slug}` // có category
-                    : `/news/${post.slug}` // không có category
+                    ? `/${locale}/news/${post.category.name}/${post.slug}` // có category
+                    : `/${locale}/news/${post.slug}` // không có category
                 }
                 key={post.id}
                 className="relative rounded-2xl overflow-hidden"
@@ -107,8 +108,8 @@ export default function Home() {
               <Link
                 href={
                   post.category?.name
-                    ? `/news/${post.category.name}/${post.slug}` // có category
-                    : `/news/${post.slug}` // không có category
+                    ? `/${locale}/news/${post.category.name}/${post.slug}` // có category
+                    : `/${locale}/news/${post.slug}` // không có category
                 }
                 key={post.id}
                 className="px-2 pb-2"
