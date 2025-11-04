@@ -6,6 +6,7 @@ import { appConfig } from '@/config/app';
 const callApi = axios.create({
   baseURL: trimEnd(appConfig.apiEndpoint, '/') + '/',
   timeout: 15_000,
+  withCredentials: true,
 });
 
 callApi.interceptors.request.use(

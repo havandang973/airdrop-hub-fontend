@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+
+import React, { useState, useMemo } from 'react';
 import {
   Table as AntdTable,
   Card,
@@ -7,18 +8,27 @@ import {
   theme,
   Spin,
   Empty,
-  Badge,
   Tag,
+  Input,
+  Select,
+  DatePicker,
+  Button,
+  Space,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTheme } from 'next-themes';
-import GradientSlider from './Slider';
-import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { useGetAirdrops } from '@/lib/hooks/airdrop';
-import { Chip } from '@heroui/chip';
 import { Avatar, AvatarGroup } from '@heroui/avatar';
 import { Tooltip } from '@heroui/tooltip';
+import Link from 'next/link';
+import {
+  SearchOutlined,
+  FilterOutlined,
+  ReloadOutlined,
+} from '@ant-design/icons';
+
+const { RangePicker } = DatePicker;
 
 interface AirdropData {
   id: string;
@@ -27,8 +37,6 @@ interface AirdropData {
   logo?: string;
   raise?: string;
   status?: string;
-  investors?: string;
-  investorlogo?: string;
   date?: string;
   funds?: any[];
 }
@@ -43,23 +51,52 @@ const toNumber = (val: string) => {
 
 const AirdropTable = () => {
   const [sortedInfo, setSortedInfo] = useState<any>({});
+  const [searchText, setSearchText] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string | undefined>();
+  const [dateRange, setDateRange] = useState<any>();
+  const [raiseFilter, setRaiseFilter] = useState<string | undefined>();
+  const [fundFilter, setFundFilter] = useState<string | undefined>();
+
   const themeNext = useTheme();
   const locale = useLocale();
   const { data: airdrops, isLoading } = useGetAirdrops();
 
-  const handleChange = (_: any, __: any, sorter: any) => {
-    setSortedInfo(sorter);
-  };
+  const handleChange = (_: any, __: any, sorter: any) => setSortedInfo(sorter);
+
+  /** ✅ Filter logic */
+  const filteredData = useMemo(() => {
+    if (!airdrops) return [];
+    return airdrops.filter((item: AirdropData) => {
+      const matchName = item.name
+        ?.toLowerCase()
+        .includes(searchText.toLowerCase());
+      const matchStatus =
+        !statusFilter || item.status?.toLowerCase() === statusFilter;
+      const matchRaise =
+        !raiseFilter || (item.raise && item.raise.includes(raiseFilter));
+      const matchFund =
+        !fundFilter ||
+        item.funds?.some((f) =>
+          f.fund?.name?.toLowerCase().includes(fundFilter.toLowerCase())
+        );
+      const matchDate =
+        !dateRange ||
+        (item.date &&
+          new Date(item.date) >= dateRange[0]._d &&
+          new Date(item.date) <= dateRange[1]._d);
+
+      return matchName && matchStatus && matchDate && matchRaise && matchFund;
+    });
+  }, [airdrops, searchText, statusFilter, dateRange, raiseFilter, fundFilter]);
 
   const columns: ColumnsType<AirdropData> = [
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
+      fixed: 'left',
       sorter: (a, b) => a.name.localeCompare(b.name),
       sortOrder: sortedInfo.columnKey === 'name' ? sortedInfo.order : null,
-      ellipsis: true,
-      showSorterTooltip: false,
       render: (text, record) => (
         <Link
           href={`/${locale}/airdrop/${record.slug}`}
@@ -86,12 +123,7 @@ const AirdropTable = () => {
       width: 140,
       sorter: (a, b) => toNumber(a.raise || '') - toNumber(b.raise || ''),
       sortOrder: sortedInfo.columnKey === 'raise' ? sortedInfo.order : null,
-      ellipsis: true,
-      showSorterTooltip: false,
-      onCell: () => ({
-        style: { fontWeight: 600 },
-      }),
-      render: (text, record) => <span>{text}</span>,
+      render: (text) => <span>$ {text}</span>,
     },
     {
       title: 'Status',
@@ -99,9 +131,7 @@ const AirdropTable = () => {
       key: 'status',
       sorter: (a, b) => (a.status || '').localeCompare(b.status || ''),
       sortOrder: sortedInfo.columnKey === 'status' ? sortedInfo.order : null,
-      ellipsis: true,
-      showSorterTooltip: false,
-      render: (text, record) => (
+      render: (text) => (
         <Tag color={text === 'active' ? 'green' : 'volcano'}>
           {text?.toUpperCase()}
         </Tag>
@@ -111,14 +141,9 @@ const AirdropTable = () => {
       title: 'Funds and Investors',
       dataIndex: 'funds',
       key: 'funds',
-      ellipsis: true,
-      showSorterTooltip: false,
       render: (_, record) => {
         const funds = record?.funds || [];
-
-        if (funds.length === 0) {
-          return <span style={{ color: '#999' }}>—</span>;
-        }
+        if (funds.length === 0) return <span style={{ color: '#999' }}>—</span>;
 
         return (
           <div className="flex items-center gap-2 max-w-[250px]">
@@ -140,7 +165,6 @@ const AirdropTable = () => {
         );
       },
     },
-
     {
       title: 'Date',
       dataIndex: 'date',
@@ -148,34 +172,17 @@ const AirdropTable = () => {
       sorter: (a, b) =>
         new Date(a.date || '').getTime() - new Date(b.date || '').getTime(),
       sortOrder: sortedInfo.columnKey === 'date' ? sortedInfo.order : null,
-      ellipsis: true,
-      showSorterTooltip: false,
     },
-    // {
-    //   title: 'Moni Score',
-    //   dataIndex: 'moniScore',
-    //   key: 'moniScore',
-    //   sorter: (a, b) => (a.moniScore || 0) - (b.moniScore || 0),
-    //   sortOrder: sortedInfo.columnKey === 'moniScore' ? sortedInfo.order : null,
-    //   ellipsis: true,
-    //   showSorterTooltip: false,
-    //   render: (text, record) => (
-    //     <div className="flex flex-col pointer-events-none">
-    //       <span className="font-semibold">{record.moniScore}</span>
-    //       <GradientSlider score={record.moniScore} />
-    //     </div>
-    //   ),
-    // },
   ];
 
+  /** Loading & Empty states */
   if (isLoading)
     return (
       <div className="flex justify-center py-10">
         <Spin size="large" />
       </div>
     );
-
-  if (!airdrops || airdrops.length === 0)
+  if (!airdrops)
     return (
       <div className="flex justify-center py-10">
         <Empty description="No data found" />
@@ -184,70 +191,90 @@ const AirdropTable = () => {
 
   return (
     <div>
-      {/* Mobile view */}
-      <div className="flex flex-col gap-4 md:hidden">
-        {airdrops.map((item: AirdropData) => (
-          <Card key={item.id} className="p-4 rounded-md shadow-sm">
-            <Link
-              href={`/${locale}/airdrop/${item.slug}`}
-              className="flex items-center gap-2"
-            >
-              {item.logo && (
-                <img
-                  src={item.logo}
-                  alt={item.name}
-                  style={{ width: 24, height: 24, borderRadius: '50%' }}
-                />
-              )}
-              <span className="font-semibold text-black dark:text-white hover:text-blue-500 transition-colors">
-                {item.name}
-              </span>
-            </Link>
-            {item.raise && (
-              <div className="flex justify-between text-sm mt-2">
-                <span>Raise</span>
-                <span className="font-semibold">{item.raise}</span>
-              </div>
-            )}
-            {item.status && (
-              <div className="flex justify-between text-sm">
-                <span>Status</span>
-                <span className="font-semibold">{item.status}</span>
-              </div>
-            )}
-            {/* {item.moniScore && (
-              <div className="flex justify-between text-sm">
-                <GradientSlider score={item.moniScore} />
-                <span className="font-semibold">{item.moniScore}</span>
-              </div>
-            )} */}
-          </Card>
-        ))}
+      {/* ✅ Thanh filter hiện đại */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl p-3 mb-5 bg-white dark:bg-[#1f1f1f] shadow-sm">
+        <Space wrap size="middle">
+          <Input
+            placeholder="Search name..."
+            prefix={<SearchOutlined />}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: '100%' }}
+          />
+          <Select
+            placeholder="Status"
+            allowClear
+            value={statusFilter}
+            onChange={(v) => setStatusFilter(v)}
+            style={{ width: 140 }}
+            options={[
+              { value: 'active', label: 'Active' },
+              { value: 'inactive', label: 'Inactive' },
+            ]}
+          />
+          <Select
+            placeholder="Raise"
+            allowClear
+            value={raiseFilter}
+            onChange={(v) => setRaiseFilter(v)}
+            style={{ width: 120 }}
+            options={[
+              { value: '0.5M', label: '< 1M' },
+              { value: '1M', label: '1M+' },
+              { value: '5M', label: '5M+' },
+            ]}
+          />
+          <Input
+            placeholder="Search fund..."
+            value={fundFilter}
+            onChange={(e) => setFundFilter(e.target.value)}
+            style={{ width: 160 }}
+          />
+          <RangePicker onChange={(val) => setDateRange(val)} />
+        </Space>
+
+        <Space>
+          <Button
+            icon={<FilterOutlined />}
+            type="primary"
+            className="bg-blue-500 hover:bg-blue-600"
+          >
+            Filter
+          </Button>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={() => {
+              setSearchText('');
+              setStatusFilter(undefined);
+              setRaiseFilter(undefined);
+              setFundFilter(undefined);
+              setDateRange(undefined);
+            }}
+          >
+            Reset
+          </Button>
+        </Space>
       </div>
 
-      {/* Desktop view */}
-      <div className="hidden md:block">
-        <ConfigProvider
-          theme={{
-            algorithm:
-              themeNext.theme === 'dark'
-                ? theme.darkAlgorithm
-                : theme.defaultAlgorithm,
-            token: {
-              fontSize: 16,
-              padding: 20,
-            },
-          }}
-        >
-          <AntdTable
-            columns={columns}
-            dataSource={airdrops}
-            rowKey="id"
-            onChange={handleChange}
-            pagination={{ pageSize: 10 }}
-          />
-        </ConfigProvider>
-      </div>
+      {/* ✅ Bảng dữ liệu */}
+      <ConfigProvider
+        theme={{
+          algorithm:
+            themeNext.theme === 'dark'
+              ? theme.darkAlgorithm
+              : theme.defaultAlgorithm,
+          token: { fontSize: 16, padding: 20 },
+        }}
+      >
+        <AntdTable
+          columns={columns}
+          dataSource={filteredData}
+          rowKey="id"
+          onChange={handleChange}
+          pagination={{ pageSize: 10 }}
+          scroll={{ x: 700 }}
+        />
+      </ConfigProvider>
     </div>
   );
 };

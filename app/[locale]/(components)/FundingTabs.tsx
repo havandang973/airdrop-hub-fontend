@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { useCryptoWidget } from '../widget';
 import AirdropTable from './AirdropTable';
 import MarketTable from './MarketTable';
+import NewsTable from './NewsTable';
 const Tabs = dynamic(() => import('antd/es/tabs'), { ssr: false });
 const FundingTabs = (props: { defaultActiveKey: string }) => {
   useCryptoWidget();
@@ -144,93 +145,7 @@ const FundingTabs = (props: { defaultActiveKey: string }) => {
           </div>
         </div>
       ),
-      children: (
-        <Card className="dark:!bg-black">
-          <div className="flex flex-col gap-4">
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
-                Kraken Funding: Monumental $500M Round Boosts Exchange
-              </p>
-              <span className="text-xs text-blue-500">Funding round</span>
-              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
-                26 Sep, 2025
-              </span>
-            </div>
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
-                Bitcoin: Michael Saylor’s Advice for Long-Term Holders
-              </p>
-              <span className="text-xs text-blue-500">Investment</span>
-              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
-                26 Sep, 2025
-              </span>
-            </div>
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
-                Kraken Funding: Monumental $500M Round Boosts Exchange
-              </p>
-              <span className="text-xs text-blue-500">Funding round</span>
-              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
-                26 Sep, 2025
-              </span>
-            </div>
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
-                Kraken Funding: Monumental $500M Round Boosts Exchange
-              </p>
-              <span className="text-xs text-blue-500">Funding round</span>
-              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
-                26 Sep, 2025
-              </span>
-            </div>
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
-                Kraken Funding: Monumental $500M Round Boosts Exchange
-              </p>
-              <span className="text-xs text-blue-500">Funding round</span>
-              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
-                26 Sep, 2025
-              </span>
-            </div>
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
-                Kraken Funding: Monumental $500M Round Boosts Exchange
-              </p>
-              <span className="text-xs text-blue-500">Funding round</span>
-              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
-                26 Sep, 2025
-              </span>
-            </div>
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
-                Kraken Funding: Monumental $500M Round Boosts Exchange
-              </p>
-              <span className="text-xs text-blue-500">Funding round</span>
-              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
-                26 Sep, 2025
-              </span>
-            </div>
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
-                Kraken Funding: Monumental $500M Round Boosts Exchange
-              </p>
-              <span className="text-xs text-blue-500">Funding round</span>
-              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
-                26 Sep, 2025
-              </span>
-            </div>
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
-                Kraken Funding: Monumental $500M Round Boosts Exchange
-              </p>
-              <span className="text-xs text-blue-500">Funding round</span>
-              <span className="float-right text-xs text-gray-500 dark:text-gray-400">
-                26 Sep, 2025
-              </span>
-            </div>
-          </div>
-        </Card>
-      ),
+      children: <NewsTable />,
     },
   ];
 

@@ -10,24 +10,33 @@ import {
   Popconfirm,
   message,
 } from 'antd';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  mutationCreateCategory,
+  mutationUpdateCategory,
+  useDeleteCategory,
+  useGetCategories,
+} from '@/lib/hooks/category';
 
 interface Category {
   id: number;
   name: string;
-  description: string;
 }
 
 export default function Page() {
   const [form] = Form.useForm();
-  const [categories, setCategories] = useState<Category[]>([
-    { id: 1, name: 'Airdrop', description: 'Airdrop category' },
-    { id: 2, name: 'Blockchain', description: 'Blockchain category' },
-  ]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const queryClient = useQueryClient();
 
-  // ✅ Open modal để tạo hoặc sửa
+  // 🟢 Lấy danh sách category
+  const { data: categories, isLoading } = useGetCategories(true);
+
+  // 🟢 Tạo / Cập nhật / Xóa
+  const { mutateAsync: createCategory } = mutationCreateCategory();
+  const { mutateAsync: updateCategory } = mutationUpdateCategory();
+  const { mutateAsync: deleteCategory } = useDeleteCategory();
+
   const openModal = (category?: Category) => {
     if (category) {
       setEditingCategory(category);
@@ -39,53 +48,36 @@ export default function Page() {
     setIsModalOpen(true);
   };
 
-  // ✅ Lưu (tạo hoặc cập nhật)
-  const handleOk = () => {
-    form.validateFields().then((values) => {
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
       if (editingCategory) {
-        // update
-        setCategories((prev) =>
-          prev.map((cat) =>
-            cat.id === editingCategory.id ? { ...cat, ...values } : cat
-          )
-        );
+        await updateCategory({
+          id: editingCategory.id,
+          obj: values,
+        });
         message.success('Category updated successfully');
       } else {
-        // create
-        const newCategory = {
-          id: Date.now(),
-          ...values,
-        };
-        setCategories((prev) => [...prev, newCategory]);
+        await createCategory(values);
         message.success('Category created successfully');
       }
+
+      // ✅ Làm mới lại danh sách sau khi CRUD
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
       setIsModalOpen(false);
-    });
+    } catch (error) {
+      message.error('Something went wrong');
+    }
   };
 
-  // ✅ Xóa
-  const handleDelete = (id: number) => {
-    setCategories((prev) => prev.filter((cat) => cat.id !== id));
+  const handleDelete = async (id: number) => {
+    await deleteCategory(id);
     message.success('Deleted successfully');
   };
 
   const columns = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      width: 80,
-    },
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
-    },
+    { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
+    { title: 'Name', dataIndex: 'name', key: 'name' },
     {
       title: 'Action',
       key: 'action',
@@ -98,7 +90,7 @@ export default function Page() {
             title="Are you sure to delete?"
             onConfirm={() => handleDelete(record.id)}
           >
-            <Button type="link" danger>
+            <Button type="link" danger loading={false}>
               Delete
             </Button>
           </Popconfirm>
@@ -117,7 +109,13 @@ export default function Page() {
       </div>
 
       <div className="mt-4 p-6 bg-white rounded-lg shadow-md">
-        <Table columns={columns} dataSource={categories} rowKey="id" bordered />
+        <Table
+          columns={columns}
+          dataSource={categories || []}
+          rowKey="id"
+          bordered
+          loading={isLoading}
+        />
       </div>
 
       <Modal
@@ -126,6 +124,7 @@ export default function Page() {
         onOk={handleOk}
         onCancel={() => setIsModalOpen(false)}
         okText="Save"
+        // confirmLoading={createMutation.isPending || updateMutation.isPending}
       >
         <Form form={form} layout="vertical">
           <Form.Item
@@ -134,9 +133,6 @@ export default function Page() {
             rules={[{ required: true, message: 'Please enter name' }]}
           >
             <Input placeholder="Category name" />
-          </Form.Item>
-          <Form.Item label="Description" name="description">
-            <Input.TextArea placeholder="Description..." rows={3} />
           </Form.Item>
         </Form>
       </Modal>

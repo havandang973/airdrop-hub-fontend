@@ -1,3 +1,7 @@
+'use client';
+import { useMe } from '@/lib/auth';
+import { useEffect } from 'react';
+
 export default function Page() {
   return (
     <div className="">

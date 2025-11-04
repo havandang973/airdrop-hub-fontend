@@ -78,8 +78,6 @@ export default function EditNewsPage() {
       categoryId: Number(values.categoryId) || null,
     };
 
-    console.log('🚀 Payload to update:', payload);
-
     updatePost(
       { id: selectedPost.id, obj: payload },
       {
@@ -135,9 +133,9 @@ export default function EditNewsPage() {
             name="thumbnail"
             valuePropName="fileList"
             getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
-            rules={[
-              { required: true, message: 'Please upload a thumbnail image!' },
-            ]}
+            // rules={[
+            //   { required: true, message: 'Please upload a thumbnail image!' },
+            // ]}
           >
             <Upload
               name="file"

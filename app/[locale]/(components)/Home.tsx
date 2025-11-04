@@ -4,11 +4,12 @@ import { Carousel, ConfigProvider } from 'antd';
 import { Divider } from '@heroui/divider';
 import { useGetPosts } from '@/lib/hooks/post';
 import { Link } from '@heroui/link';
+import { useLocale } from 'next-intl';
 
 export default function Home() {
-  const { data, isLoading } = useGetPosts();
+  const { data, isLoading } = useGetPosts(true, 'all');
   const posts = data ?? [];
-
+  const locale = useLocale();
   // ✅ Lọc bài viết
   const heroPosts: any = posts
     .filter((p) => p.pin_to_home && !p.pin)
@@ -21,7 +22,7 @@ export default function Home() {
     ); // sắp xếp bài mới nhất lên đầu
 
   if (isLoading) return <div>Loading...</div>;
-  console.log('heroPosts', heroPosts);
+
   return (
     <div className="container mx-auto space-y-8">
       {/* Hero section */}
@@ -30,9 +31,9 @@ export default function Home() {
           {/* Bài lớn */}
           <Link
             href={
-              heroPosts.category?.name
-                ? `/news/${heroPosts.category.name}/${heroPosts.slug}` // có category
-                : `/news/${heroPosts.slug}` // không có category
+              heroPosts[0].category?.name
+                ? `/${locale}/news/${heroPosts[0].category.name}/${heroPosts[0].slug}` // có category
+                : `/${locale}/news/${heroPosts[0].slug}` // không có category
             }
             key={heroPosts.id}
             className="md:col-span-3 relative rounded-2xl overflow-hidden"
@@ -55,8 +56,8 @@ export default function Home() {
               <Link
                 href={
                   post.category?.name
-                    ? `/news/${post.category.name}/${post.slug}` // có category
-                    : `/news/${post.slug}` // không có category
+                    ? `/${locale}/news/${post.category.name}/${post.slug}` // có category
+                    : `/${locale}/news/${post.slug}` // không có category
                 }
                 key={post.id}
                 className="relative rounded-2xl overflow-hidden"
@@ -102,13 +103,29 @@ export default function Home() {
             arrows
             infinite
             autoplay
+            responsive={[
+              {
+                breakpoint: 768, // dưới 768px (mobile)
+                settings: {
+                  slidesToShow: 1,
+                  slidesToScroll: 1,
+                },
+              },
+              {
+                breakpoint: 1024, // dưới 1024px (tablet)
+                settings: {
+                  slidesToShow: 2,
+                  slidesToScroll: 1,
+                },
+              },
+            ]}
           >
             {carouselPosts.map((post) => (
               <Link
                 href={
                   post.category?.name
-                    ? `/news/${post.category.name}/${post.slug}` // có category
-                    : `/news/${post.slug}` // không có category
+                    ? `/${locale}/news/${post.category.name}/${post.slug}` // có category
+                    : `/${locale}/news/${post.slug}` // không có category
                 }
                 key={post.id}
                 className="px-2 pb-2"

@@ -21,7 +21,7 @@ import {
 import { useDeletePost, useGetPosts } from '@/lib/hooks/post';
 
 export default function NewsPage() {
-  const { data: posts, isLoading } = useGetPosts();
+  const { data: posts, isLoading } = useGetPosts(true, 'all');
   const { mutate: deletePost, isPending } = useDeletePost();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

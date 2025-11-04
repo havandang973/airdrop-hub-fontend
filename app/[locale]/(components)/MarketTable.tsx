@@ -358,6 +358,7 @@ const MarketTable = () => {
       <div className="md:hidden !space-y-5">
         {data.map((item) => (
           <ConfigProvider
+            key={item.key}
             theme={{
               components: {
                 Collapse: {
