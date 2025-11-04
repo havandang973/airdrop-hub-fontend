@@ -103,6 +103,22 @@ export default function Home() {
             arrows
             infinite
             autoplay
+            responsive={[
+              {
+                breakpoint: 768, // dưới 768px (mobile)
+                settings: {
+                  slidesToShow: 1,
+                  slidesToScroll: 1,
+                },
+              },
+              {
+                breakpoint: 1024, // dưới 1024px (tablet)
+                settings: {
+                  slidesToShow: 2,
+                  slidesToScroll: 1,
+                },
+              },
+            ]}
           >
             {carouselPosts.map((post) => (
               <Link

@@ -1,6 +1,6 @@
 'use client';
 
-import { useLogout } from '@/lib/auth';
+import { useLogout, useMe } from '@/lib/auth';
 import { Avatar } from '@heroui/avatar';
 import { Popover, PopoverTrigger, PopoverContent } from '@heroui/popover';
 import { IconUsers, IconLogout } from '@tabler/icons-react';
@@ -9,18 +9,21 @@ import { useRouter } from 'next/navigation';
 export default function FooterAdmin() {
   const router = useRouter();
   const { mutate: logout } = useLogout();
+  const { data: user } = useMe(true);
+
   const handleLogout = () => {
     router.push('/admin/login');
     logout();
   };
+
   return (
     <>
       <Popover placement="right">
         <PopoverTrigger>
           <div className="flex items-center cursor-pointer p-2 rounded-lg hover:bg-gray-800/40 transition-colors">
-            <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026024d" />
+            <Avatar name={user?.name} size="md" />
             <div className="ml-3 text-left">
-              <p className="text-sm font-medium text-white">Admin</p>
+              <p className="text-sm font-medium text-white">{user?.name}</p>
               <p className="text-xs text-gray-400">View profile</p>
             </div>
           </div>

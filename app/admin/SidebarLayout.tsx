@@ -15,7 +15,7 @@ import {
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useLogout } from '@/lib/auth';
+import { useLogout, useMe } from '@/lib/auth';
 import { Button } from '@heroui/button';
 import FooterAdmin from './(components)/FooterAdmin';
 

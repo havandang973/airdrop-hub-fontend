@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { callApi } from "@/lib/http";
 import { login } from "./api/auth/login";
 import { logout } from "./api/auth/logout";
+import { getMe } from "./api/auth/getMe";
 
 export const useLogin = () => {
     const queryClient = useQueryClient();
@@ -10,7 +11,7 @@ export const useLogin = () => {
         mutationFn: (body: { email: string; password: string }) => login(body),
         onSuccess: async () => {
             // ✅ Sau khi login thành công, refetch lại thông tin user
-            await queryClient.invalidateQueries({ queryKey: ["me"] });
+            await queryClient.refetchQueries({ queryKey: ["me"] });
         },
     });
 };
@@ -20,19 +21,13 @@ export const useLogout = () => {
     return useMutation({
         mutationKey: ["logout"],
         mutationFn: () => logout(),
-        onSuccess: () => {
-            queryClient.setQueryData(["me"], null);
-        },
     });
 };
 
 export const useMe = (enabled = true) => {
     return useQuery({
         queryKey: ["me"],
-        queryFn: async () => {
-            const { data } = await callApi.get("/auth/me");
-            return data;
-        },
+        queryFn: () => getMe(),
         enabled,
     });
 };

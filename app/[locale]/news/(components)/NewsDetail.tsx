@@ -73,12 +73,12 @@ export default function NewsDetailPage() {
             <CalendarOutlined className="mr-1" />
             {new Date(post.createdAt).toLocaleDateString('vi-VN')}
           </span>
-          {post.view !== undefined && (
+          {/* {post.view !== undefined && (
             <span>
               <EyeOutlined className="mr-1" />
               {post.view}
             </span>
-          )}
+          )} */}
         </div>
 
         {/* {post.thumbnail && (
