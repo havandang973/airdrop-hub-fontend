@@ -5,19 +5,27 @@ import { Divider } from '@heroui/divider';
 import { useGetPosts } from '@/lib/hooks/post';
 import { Link } from '@heroui/link';
 import { useLocale } from 'next-intl';
+import { useState } from 'react';
 
 export default function Home() {
-  const { data, isLoading } = useGetPosts(true, 'all');
-  const posts = data ?? [];
+  const [filters, setFilters] = useState({
+    title: '',
+    category: 'all',
+    visibility: 1,
+    page: 1,
+    size: 10,
+  });
+  const { data: posts, isLoading } = useGetPosts(filters);
+
   const locale = useLocale();
   // ✅ Lọc bài viết
-  const heroPosts: any = posts
-    .filter((p) => p.pin_to_home && !p.pin)
+  const heroPosts: any = posts?.data
+    .filter((p: any) => p.pin_to_home && !p.pin)
     .slice(0, 5);
-  const carouselPosts = posts
-    .filter((p) => p.pin || p.pin_to_home)
+  const carouselPosts = posts?.data
+    .filter((p: any) => p.pin || p.pin_to_home)
     .sort(
-      (a, b) =>
+      (a: any, b: any) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     ); // sắp xếp bài mới nhất lên đầu
 
@@ -26,7 +34,7 @@ export default function Home() {
   return (
     <div className="container mx-auto space-y-8">
       {/* Hero section */}
-      {heroPosts.length > 0 && (
+      {heroPosts?.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {/* Bài lớn */}
           <Link
@@ -81,7 +89,7 @@ export default function Home() {
       <Divider />
 
       {/* Carousel */}
-      {carouselPosts.length > 0 && (
+      {carouselPosts?.length > 0 && (
         <ConfigProvider
           theme={{
             components: {
@@ -120,7 +128,7 @@ export default function Home() {
               },
             ]}
           >
-            {carouselPosts.map((post) => (
+            {carouselPosts.map((post: any) => (
               <Link
                 href={
                   post.category?.name

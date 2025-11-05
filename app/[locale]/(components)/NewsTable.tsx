@@ -7,7 +7,13 @@ import Image from 'next/image';
 import { useLocale } from 'next-intl';
 
 export default function NewsTable() {
-  const { data, isLoading } = useGetPosts(true, 'all');
+  const { data: posts, isLoading } = useGetPosts({
+    title: '',
+    category: 'all',
+    visibility: 1,
+    page: 1,
+    size: 10,
+  });
 
   if (isLoading) {
     return (
@@ -17,7 +23,7 @@ export default function NewsTable() {
     );
   }
 
-  const latestNews = (data || []).slice(0, 10);
+  const latestNews = (posts?.data || []).slice(0, 10);
   const locale = useLocale();
   return (
     // <Card className="p-6 dark:!bg-black">

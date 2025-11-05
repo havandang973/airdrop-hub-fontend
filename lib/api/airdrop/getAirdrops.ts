@@ -10,7 +10,19 @@ export interface IAccountWallet {
   freeBalance: number
 }
 
-export const getAirdrops = async (): Promise<any[]> => {
-  const { data } = await callApi.get("airdrop");
+export const getAirdrops = async (params: {
+  page?: number;
+  size?: number;
+  name?: string;
+  status?: string;
+  fund?: string;
+  minRaise?: number;
+  maxRaise?: number;
+  startDate?: string;
+  endDate?: string;
+}) => {
+  const { data } = await callApi.get("/airdrop", { params });
   return data;
 };
+
+

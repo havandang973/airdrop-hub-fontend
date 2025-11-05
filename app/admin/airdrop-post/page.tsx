@@ -19,7 +19,12 @@ import { useState } from 'react';
 import { useDeleteAirdropPost, useGetAirdropPosts } from '@/lib/hooks/airdrop';
 
 export default function Page() {
-  const { data: posts, isLoading } = useGetAirdropPosts();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const { data: posts, isLoading } = useGetAirdropPosts({
+    page,
+    size: pageSize,
+  });
   const { mutate: deletePost, isPending } = useDeleteAirdropPost();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -125,10 +130,18 @@ export default function Page() {
       <div className="p-6 bg-white rounded-lg shadow-md">
         <Table
           columns={columns}
-          dataSource={posts || []}
+          dataSource={posts?.data || []}
           loading={isLoading}
           rowKey="id"
-          pagination={{ pageSize: 10 }}
+          pagination={{
+            current: page,
+            pageSize,
+            total: posts?.pagination?.total || 0,
+            onChange: (page, pageSize) => {
+              setPage(page);
+              setPageSize(pageSize);
+            },
+          }}
         />
       </div>
 

@@ -21,7 +21,12 @@ import { Link } from '@heroui/link';
 import { use, useState } from 'react';
 
 export default function Page() {
-  const { data: airdrops, isLoading } = useGetAirdrops();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const { data: airdrops, isLoading } = useGetAirdrops({
+    page,
+    size: pageSize,
+  });
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { mutate: deleteAirdrop, isPending } = useDeleteAirdrop();
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -162,12 +167,28 @@ export default function Page() {
         Airdrop List
       </h1>
       <div className="p-6 bg-white rounded-lg shadow-md">
-        <Table
+        {/* <Table
           columns={columns}
-          dataSource={airdrops || []}
+          dataSource={airdrops?.data || []}
           loading={isLoading}
           rowKey="id"
           pagination={{ pageSize: 10 }}
+        /> */}
+
+        <Table
+          columns={columns}
+          dataSource={airdrops?.data || []}
+          loading={isLoading}
+          rowKey="id"
+          pagination={{
+            current: page,
+            pageSize,
+            total: airdrops?.pagination?.total || 0, // tổng số bản ghi backend trả về
+            onChange: (page, pageSize) => {
+              setPage(page);
+              setPageSize(pageSize);
+            },
+          }}
         />
       </div>
     </div>

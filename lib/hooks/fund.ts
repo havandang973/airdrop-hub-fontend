@@ -6,10 +6,10 @@ import { updateFund } from "../api/fund/updateFund";
 import { deleteFund } from "../api/fund/deleteFund";
 import { getFunds } from "../api/fund/getFunds";
 
-export const useGetFunds = (enabled?: boolean) => {
+export const useGetFunds = (filters?: any) => {
     return useQuery({
-        queryKey: ['funds', appConfig.version],
-        queryFn: getFunds,
+        queryKey: ['funds', appConfig.version, filters],
+        queryFn: () => getFunds(filters),
         enabled: true,
         refetchIntervalInBackground: true,
         staleTime: 0,
@@ -17,10 +17,10 @@ export const useGetFunds = (enabled?: boolean) => {
     });
 };
 
-export const useGetFund = (identifier: string, enabled: boolean) => {
+export const useGetFund = (identifier: string, enabled: boolean, filters?: any) => {
     return useQuery({
-        queryKey: ['fund', identifier, appConfig.version],
-        queryFn: () => getFund(identifier!),
+        queryKey: ['fund', identifier, appConfig.version, filters],
+        queryFn: () => getFund(identifier!, filters),
         enabled,
         refetchIntervalInBackground: true,
         staleTime: 0,

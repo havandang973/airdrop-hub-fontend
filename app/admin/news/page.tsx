@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Flex, Table, Tag, Switch } from 'antd';
 import { Button } from '@heroui/button';
 import { Link } from '@heroui/link';
@@ -21,7 +21,21 @@ import {
 import { useDeletePost, useGetPosts } from '@/lib/hooks/post';
 
 export default function NewsPage() {
-  const { data: posts, isLoading } = useGetPosts(true, 'all');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [filters, setFilters] = useState({
+    title: '',
+    category: 'all',
+    visibility: undefined as number | undefined,
+    page,
+    size: pageSize,
+  });
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, page, size: pageSize }));
+  }, [page, pageSize]);
+
+  const { data: posts, isLoading } = useGetPosts(filters);
   const { mutate: deletePost, isPending } = useDeletePost();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -151,10 +165,20 @@ export default function NewsPage() {
       <div className="p-6 bg-white rounded-lg shadow-md">
         <Table
           columns={columns}
-          dataSource={posts || []}
+          dataSource={posts?.data || []}
           loading={isLoading}
           rowKey="id"
-          pagination={{ pageSize: 10 }}
+          pagination={{
+            current: page,
+            pageSize,
+            total: posts?.pagination?.total,
+            onChange: (page, pageSize) => {
+              setPage(page);
+              setPageSize(pageSize);
+            },
+          }}
+          // onChange={handleChange}
+          scroll={{ x: 700 }}
         />
       </div>
 
