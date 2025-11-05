@@ -1,14 +1,15 @@
 import { callApi } from "@/lib/http";
 
-export const getPosts = async (category?: string, visibility?: boolean): Promise<any[]> => {
-    const params: Record<string, any> = {};
+export const getPosts = async (params: {
+    page?: number;
+    size?: number;
+    title?: string;
+    category?: string;
+    visibility?: number;
+}) => {
 
-    if (category && category !== 'all') {
-        params.category = category;
-    }
-
-    if (visibility !== undefined) {
-        params.visibility = visibility;
+    if (params.category && params.category !== 'all') {
+        params.category = params.category;
     }
 
     const { data } = await callApi.get('/posts', { params });

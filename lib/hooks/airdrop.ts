@@ -12,10 +12,10 @@ import { deleteAirdropPost } from "../api/airdrop/deleteAirdropPost";
 import { updateAirdropPost } from "../api/airdrop/updateAirdropPost";
 import { getAirdropPostDetail } from "../api/airdrop/getAirdropPostDetail";
 
-export const useGetAirdrops = (enabled?: boolean) => {
+export const useGetAirdrops = (filters?: any) => {
   return useQuery({
-    queryKey: ['airdrops', appConfig.version],
-    queryFn: getAirdrops,
+    queryKey: ['airdrops', appConfig.version, filters],
+    queryFn: () => getAirdrops(filters),
     enabled: true,
     refetchIntervalInBackground: true,
     staleTime: 0,
@@ -56,10 +56,10 @@ export const useGetAirdropPostDetail = (id: number, enabled: boolean) => {
   });
 };
 
-export const useGetAirdropPosts = () => {
+export const useGetAirdropPosts = ({ page, size }: { page?: number, size?: number }) => {
   return useQuery({
-    queryKey: ['airdrop-posts', appConfig.version],
-    queryFn: () => getAirdropPosts(),
+    queryKey: ['airdrop-posts', appConfig.version, page, size],
+    queryFn: () => getAirdropPosts(page, size),
     enabled: true,
     refetchIntervalInBackground: true,
     staleTime: 0,

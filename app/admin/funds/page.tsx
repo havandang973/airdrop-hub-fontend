@@ -15,11 +15,28 @@ import {
   IconPencil,
   IconTrash,
 } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDeleteFund, useGetFunds } from '@/lib/hooks/fund';
 
 export default function FundsPage() {
-  const { data: funds, isLoading } = useGetFunds();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [filters, setFilters] = useState({
+    name: '',
+    status: undefined as string | undefined,
+    startDate: undefined as string | undefined,
+    endDate: undefined as string | undefined,
+    minRaise: undefined as number | undefined,
+    maxRaise: undefined as number | undefined,
+    page,
+    size: pageSize,
+  });
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, page, size: pageSize }));
+  }, [page, pageSize]);
+
+  const { data: funds, isLoading } = useGetFunds(filters);
   const { mutate: deleteFund, isPending } = useDeleteFund();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -111,10 +128,20 @@ export default function FundsPage() {
       <div className="p-6 bg-white rounded-lg shadow-md">
         <Table
           columns={columns}
-          dataSource={funds || []}
+          dataSource={funds?.data || []}
           loading={isLoading}
           rowKey="id"
-          pagination={{ pageSize: 10 }}
+          pagination={{
+            current: page,
+            pageSize,
+            total: funds?.pagination?.total,
+            onChange: (page, pageSize) => {
+              setPage(page);
+              setPageSize(pageSize);
+            },
+          }}
+          // onChange={handleChange}
+          scroll={{ x: 700 }}
         />
       </div>
 

@@ -1,13 +1,10 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Table as AntdTable,
-  Card,
+  Table,
   ConfigProvider,
   theme,
-  Spin,
-  Empty,
   Tag,
   Input,
   Select,
@@ -15,103 +12,67 @@ import {
   Button,
   Space,
 } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
 import { useTheme } from 'next-themes';
 import { useLocale } from 'next-intl';
 import { useGetAirdrops } from '@/lib/hooks/airdrop';
+import Link from 'next/link';
+import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { toNumber } from 'lodash';
 import { Avatar, AvatarGroup } from '@heroui/avatar';
 import { Tooltip } from '@heroui/tooltip';
-import Link from 'next/link';
-import {
-  SearchOutlined,
-  FilterOutlined,
-  ReloadOutlined,
-} from '@ant-design/icons';
+import { Time } from '@/lib/helpers/Time';
 
 const { RangePicker } = DatePicker;
 
-interface AirdropData {
-  id: string;
-  name: string;
-  slug: string;
-  logo?: string;
-  raise?: string;
-  status?: string;
-  date?: string;
-  funds?: any[];
-}
-
-const toNumber = (val: string) => {
-  if (!val) return 0;
-  const num = parseFloat(val.replace(/[^0-9.]/g, ''));
-  if (val.includes('M')) return num * 1_000_000;
-  if (val.includes('K')) return num * 1_000;
-  return num;
-};
-
 const AirdropTable = () => {
-  const [sortedInfo, setSortedInfo] = useState<any>({});
-  const [searchText, setSearchText] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string | undefined>();
-  const [dateRange, setDateRange] = useState<any>();
-  const [raiseFilter, setRaiseFilter] = useState<string | undefined>();
-  const [fundFilter, setFundFilter] = useState<string | undefined>();
-
   const themeNext = useTheme();
   const locale = useLocale();
-  const { data: airdrops, isLoading } = useGetAirdrops();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  // --- Filters & Pagination ---
+  const [filters, setFilters] = useState({
+    name: '',
+    status: undefined as string | undefined,
+    fund: '',
+    startDate: undefined as string | undefined,
+    endDate: undefined as string | undefined,
+    minRaise: undefined as number | undefined,
+    maxRaise: undefined as number | undefined,
+    page,
+    size: pageSize,
+  });
 
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, page, size: pageSize }));
+  }, [page, pageSize]);
+
+  const { data, isLoading } = useGetAirdrops(filters);
+  const airdrops = data?.data || [];
+  const total = data?.pagination?.total || 0;
+  const [sortedInfo, setSortedInfo] = useState<any>({});
   const handleChange = (_: any, __: any, sorter: any) => setSortedInfo(sorter);
 
-  /** ✅ Filter logic */
-  const filteredData = useMemo(() => {
-    if (!airdrops) return [];
-    return airdrops.filter((item: AirdropData) => {
-      const matchName = item.name
-        ?.toLowerCase()
-        .includes(searchText.toLowerCase());
-      const matchStatus =
-        !statusFilter || item.status?.toLowerCase() === statusFilter;
-      const matchRaise =
-        !raiseFilter || (item.raise && item.raise.includes(raiseFilter));
-      const matchFund =
-        !fundFilter ||
-        item.funds?.some((f) =>
-          f.fund?.name?.toLowerCase().includes(fundFilter.toLowerCase())
-        );
-      const matchDate =
-        !dateRange ||
-        (item.date &&
-          new Date(item.date) >= dateRange[0]._d &&
-          new Date(item.date) <= dateRange[1]._d);
-
-      return matchName && matchStatus && matchDate && matchRaise && matchFund;
-    });
-  }, [airdrops, searchText, statusFilter, dateRange, raiseFilter, fundFilter]);
-
-  const columns: ColumnsType<AirdropData> = [
+  // --- Columns ---
+  const columns: any = [
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      fixed: 'left',
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      sorter: (a: any, b: any) => a.name.localeCompare(b.name),
       sortOrder: sortedInfo.columnKey === 'name' ? sortedInfo.order : null,
-      render: (text, record) => (
+      render: (text: string, record: any) => (
         <Link
           href={`/${locale}/airdrop/${record.slug}`}
-          className="flex items-center gap-2"
+          className="font-semibold text-black dark:text-white hover:text-blue-500 transition-colors"
         >
           {record.logo && (
             <img
               src={record.logo}
               alt={text}
-              className="w-8 h-8 rounded-full object-cover"
+              className="w-8 h-8 rounded-full inline-block mr-2"
             />
           )}
-          <span className="font-semibold text-black dark:text-white hover:text-blue-500 transition-colors">
-            {text}
-          </span>
+          {text}
         </Link>
       ),
     },
@@ -120,18 +81,19 @@ const AirdropTable = () => {
       dataIndex: 'raise',
       key: 'raise',
       align: 'right',
-      width: 140,
-      sorter: (a, b) => toNumber(a.raise || '') - toNumber(b.raise || ''),
+      sorter: (a: any, b: any) =>
+        toNumber(a.raise || '') - toNumber(b.raise || ''),
       sortOrder: sortedInfo.columnKey === 'raise' ? sortedInfo.order : null,
-      render: (text) => <span>$ {text}</span>,
+      render: (text: string) => <span>$ {text} M</span>,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      sorter: (a, b) => (a.status || '').localeCompare(b.status || ''),
+      sorter: (a: any, b: any) =>
+        (a.status || '').localeCompare(b.status || ''),
       sortOrder: sortedInfo.columnKey === 'status' ? sortedInfo.order : null,
-      render: (text) => (
+      render: (text: string) => (
         <Tag color={text === 'active' ? 'green' : 'volcano'}>
           {text?.toUpperCase()}
         </Tag>
@@ -141,7 +103,7 @@ const AirdropTable = () => {
       title: 'Funds and Investors',
       dataIndex: 'funds',
       key: 'funds',
-      render: (_, record) => {
+      render: (_: any, record: any) => {
         const funds = record?.funds || [];
         if (funds.length === 0) return <span style={{ color: '#999' }}>—</span>;
 
@@ -169,94 +131,116 @@ const AirdropTable = () => {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
-      sorter: (a, b) =>
+      sorter: (a: any, b: any) =>
         new Date(a.date || '').getTime() - new Date(b.date || '').getTime(),
       sortOrder: sortedInfo.columnKey === 'date' ? sortedInfo.order : null,
+      render: (date: Date) => <span>{Time({ date, variant: 'day' })}</span>,
     },
   ];
 
-  /** Loading & Empty states */
-  if (isLoading)
-    return (
-      <div className="flex justify-center py-10">
-        <Spin size="large" />
-      </div>
-    );
-  if (!airdrops)
-    return (
-      <div className="flex justify-center py-10">
-        <Empty description="No data found" />
-      </div>
-    );
+  // --- Handlers ---
+  const handleFilter = () => {
+    setFilters((prev) => ({ ...prev, page: 1 })); // reset page về 1
+  };
+
+  const handleReset = () => {
+    setFilters({
+      name: '',
+      status: undefined,
+      fund: '',
+      startDate: undefined,
+      endDate: undefined,
+      minRaise: undefined,
+      maxRaise: undefined,
+      page: 1,
+      size: 10,
+    });
+  };
 
   return (
     <div>
-      {/* ✅ Thanh filter hiện đại */}
+      {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl p-3 mb-5 bg-white dark:bg-[#1f1f1f] shadow-sm">
         <Space wrap size="middle">
           <Input
             placeholder="Search name..."
             prefix={<SearchOutlined />}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: '100%' }}
+            value={filters.name}
+            onChange={(e) =>
+              setFilters((p) => ({ ...p, name: e.target.value }))
+            }
+            style={{ width: 200 }}
           />
           <Select
             placeholder="Status"
             allowClear
-            value={statusFilter}
-            onChange={(v) => setStatusFilter(v)}
+            value={filters.status}
+            onChange={(v) => setFilters((p) => ({ ...p, status: v }))}
             style={{ width: 140 }}
             options={[
               { value: 'active', label: 'Active' },
               { value: 'inactive', label: 'Inactive' },
             ]}
           />
-          <Select
-            placeholder="Raise"
-            allowClear
-            value={raiseFilter}
-            onChange={(v) => setRaiseFilter(v)}
-            style={{ width: 120 }}
-            options={[
-              { value: '0.5M', label: '< 1M' },
-              { value: '1M', label: '1M+' },
-              { value: '5M', label: '5M+' },
-            ]}
-          />
+          <div className="flex items-center">
+            <Input
+              type="number"
+              placeholder="Start raise"
+              min={0}
+              value={String(filters.minRaise)}
+              onChange={(e) =>
+                setFilters((p) => ({ ...p, minRaise: Number(e.target.value) }))
+              }
+              className="!rounded-none !rounded-l-md"
+            />
+            <Input
+              type="number"
+              placeholder="End raise"
+              min={0}
+              value={String(filters.maxRaise)}
+              onChange={(e) =>
+                setFilters((p) => ({ ...p, maxRaise: Number(e.target.value) }))
+              }
+              className="!rounded-none !rounded-r-md"
+            />
+          </div>
+
           <Input
             placeholder="Search fund..."
-            value={fundFilter}
-            onChange={(e) => setFundFilter(e.target.value)}
+            value={filters.fund}
+            onChange={(e) =>
+              setFilters((p) => ({ ...p, fund: e.target.value }))
+            }
             style={{ width: 160 }}
           />
-          <RangePicker onChange={(val) => setDateRange(val)} />
+
+          <RangePicker
+            onChange={(dates) =>
+              setFilters((p) => ({
+                ...p,
+                startDate: dates?.[0]?.format('YYYY-MM-DD'),
+                endDate: dates?.[1]?.format('YYYY-MM-DD'),
+              }))
+            }
+          />
         </Space>
 
         <Space>
-          <Button
+          {/* <Button
             icon={<FilterOutlined />}
             type="primary"
             className="bg-blue-500 hover:bg-blue-600"
+            onClick={handleFilter}
           >
             Filter
-          </Button>
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={() => {
-              setSearchText('');
-              setStatusFilter(undefined);
-              setRaiseFilter(undefined);
-              setFundFilter(undefined);
-              setDateRange(undefined);
-            }}
-          >
+          </Button> */}
+          <Button icon={<ReloadOutlined />} onClick={handleReset}>
             Reset
           </Button>
         </Space>
       </div>
 
-      {/* ✅ Bảng dữ liệu */}
+      {/* Table */}
       <ConfigProvider
         theme={{
           algorithm:
@@ -266,12 +250,21 @@ const AirdropTable = () => {
           token: { fontSize: 16, padding: 20 },
         }}
       >
-        <AntdTable
+        <Table
           columns={columns}
-          dataSource={filteredData}
+          dataSource={airdrops}
           rowKey="id"
+          loading={isLoading}
+          pagination={{
+            current: page,
+            pageSize,
+            total,
+            onChange: (page, pageSize) => {
+              setPage(page);
+              setPageSize(pageSize);
+            },
+          }}
           onChange={handleChange}
-          pagination={{ pageSize: 10 }}
           scroll={{ x: 700 }}
         />
       </ConfigProvider>

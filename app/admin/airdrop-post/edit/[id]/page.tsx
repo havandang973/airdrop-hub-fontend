@@ -129,7 +129,7 @@ export default function EditAirdropPostPage() {
           >
             <Select
               placeholder="Select an Airdrop"
-              loading={!airdrops?.length}
+              loading={!airdrops?.data.length}
               allowClear
               showSearch
               optionLabelProp="label" // dùng label để filter và hiển thị tag
@@ -137,7 +137,7 @@ export default function EditAirdropPostPage() {
                 option.label.toLowerCase().includes(input.toLowerCase())
               }
             >
-              {airdrops?.map((item) => (
+              {airdrops?.data.map((item: any) => (
                 <Select.Option key={item.id} value={item.id} label={item.name}>
                   <div className="flex items-center gap-2">
                     <img

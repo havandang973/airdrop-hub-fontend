@@ -14,7 +14,7 @@ import TinyEditor from '../../airdrop/(components)/TinyEditor';
 export default function Page() {
   const [form] = Form.useForm();
   const { mutate: createAirdrop } = mutationCreateAirdropPost();
-  const { data: airdrops, isLoading } = useGetAirdrops();
+  const { data: airdrops } = useGetAirdrops();
 
   // ⚙️ Cấu hình Cloudinary
   const CLOUD_NAME = 'dzdbaikqm'; // 👉 thay bằng của bạn
@@ -100,7 +100,7 @@ export default function Page() {
           >
             <Select
               placeholder="Select an Airdrop"
-              loading={!airdrops?.length}
+              loading={!airdrops?.data.length}
               allowClear
               showSearch
               optionLabelProp="label" // dùng label để filter và hiển thị tag
@@ -108,7 +108,7 @@ export default function Page() {
                 option.label.toLowerCase().includes(input.toLowerCase())
               }
             >
-              {airdrops?.map((item) => (
+              {airdrops?.data.map((item: any) => (
                 <Select.Option key={item.id} value={item.id} label={item.name}>
                   <div className="flex items-center gap-2">
                     <img

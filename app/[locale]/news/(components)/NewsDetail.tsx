@@ -10,7 +10,6 @@ import { useLocale } from 'next-intl';
 import React, { useEffect, useState } from 'react';
 
 export default function NewsDetailPage() {
-  console.log('vaooooo');
   const locale = useLocale();
   const params = useParams() as { params?: string[] };
 
@@ -24,9 +23,13 @@ export default function NewsDetailPage() {
   }
 
   const slug = params.params.length > 1 ? params.params[1] : params.params[0];
-
   const { data: article, isLoading } = useGetPost(slug, !!slug);
-  const { data: recentPosts } = useGetPosts(true, 'all');
+  const { data: recentPosts } = useGetPosts({
+    page: 1,
+    size: 5,
+    category: 'all',
+    visibility: 1,
+  });
   const [post, setPost] = useState<any | null>(null);
 
   useEffect(() => {
@@ -102,7 +105,7 @@ export default function NewsDetailPage() {
         <div className="sticky top-20">
           <h2 className="text-lg font-semibold mb-4">Bài viết mới nhất</h2>
           <div className="!space-y-5">
-            {recentPosts?.slice(0, 5).map((post: any) => (
+            {recentPosts?.data.map((post: any) => (
               <ConfigProvider
                 key={post.id}
                 theme={{

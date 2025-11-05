@@ -8,28 +8,47 @@ import {
   Table as AntdTable,
   theme,
   Tag,
+  Space,
+  Input,
+  Select,
+  DatePicker,
+  Button,
 } from 'antd';
 import { useEffect, useState } from 'react';
-import {
-  useGetAirdrop,
-  useGetAirdropPost,
-  useGetAirdrops,
-} from '@/lib/hooks/airdrop';
 import { useParams } from 'next/navigation';
-import { stat } from 'fs';
-import { IconDots, IconPointFilled } from '@tabler/icons-react';
 import { useGetFund } from '@/lib/hooks/fund';
 import { Link } from '@heroui/link';
 import { useLocale } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { ColumnsType } from 'antd/es/table';
 import { toNumber } from 'lodash';
+import { Time } from '@/lib/helpers/Time';
+import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 
 export default function Page() {
+  console.log('renderr');
   const params = useParams();
   const themeNext = useTheme();
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
-  const { data: fund, isLoading } = useGetFund(slug as string, !!slug);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  // --- Filters & Pagination ---
+  const [filters, setFilters] = useState({
+    name: '',
+    status: undefined as string | undefined,
+    startDate: undefined as string | undefined,
+    endDate: undefined as string | undefined,
+    minRaise: undefined as number | undefined,
+    maxRaise: undefined as number | undefined,
+    page,
+    size: pageSize,
+  });
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, page, size: pageSize }));
+  }, [page, pageSize]);
+  const { data: fund, isLoading } = useGetFund(slug as string, !!slug, filters);
+
   const [zoomSrc, setZoomSrc] = useState<string | null>(null);
   const locale = useLocale();
   const [data, setData] = useState<any>(fund);
@@ -40,6 +59,19 @@ export default function Page() {
 
   const handleChange = (_: any, __: any, sorter: any) => {
     setSortedInfo(sorter);
+  };
+
+  const handleReset = () => {
+    setFilters({
+      name: '',
+      status: undefined,
+      startDate: undefined,
+      endDate: undefined,
+      minRaise: undefined,
+      maxRaise: undefined,
+      page: 1,
+      size: 10,
+    });
   };
 
   const columns: ColumnsType<any> = [
@@ -107,16 +139,19 @@ export default function Page() {
       sortOrder: sortedInfo.columnKey === 'date' ? sortedInfo.order : null,
       ellipsis: true,
       showSorterTooltip: false,
+      render: (text, record) => (
+        <span>{Time({ date: new Date(text), variant: 'day' })}</span>
+      ),
     },
   ];
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-[50vh]">
-        <Spin size="large" />
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-[50vh]">
+  //       <Spin size="large" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="space-y-10">
@@ -203,6 +238,82 @@ export default function Page() {
       </div>
 
       <div className="hidden md:block">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl p-3 mb-5 bg-white dark:bg-[#1f1f1f] shadow-sm">
+          <Space wrap size="middle">
+            <Input
+              placeholder="Search name..."
+              prefix={<SearchOutlined />}
+              value={filters.name}
+              onChange={(e) =>
+                setFilters((p) => ({ ...p, name: e.target.value }))
+              }
+              style={{ width: 200 }}
+            />
+            <Select
+              placeholder="Status"
+              allowClear
+              value={filters.status}
+              onChange={(v) => setFilters((p) => ({ ...p, status: v }))}
+              style={{ width: 140 }}
+              options={[
+                { value: 'active', label: 'Active' },
+                { value: 'inactive', label: 'Inactive' },
+              ]}
+            />
+            <div className="flex items-center">
+              <Input
+                type="number"
+                placeholder="Start raise"
+                min={0}
+                value={String(filters.minRaise)}
+                onChange={(e) =>
+                  setFilters((p) => ({
+                    ...p,
+                    minRaise: Number(e.target.value),
+                  }))
+                }
+                className="!rounded-none !rounded-l-md"
+              />
+              <Input
+                type="number"
+                placeholder="End raise"
+                min={0}
+                value={String(filters.maxRaise)}
+                onChange={(e) =>
+                  setFilters((p) => ({
+                    ...p,
+                    maxRaise: Number(e.target.value),
+                  }))
+                }
+                className="!rounded-none !rounded-r-md"
+              />
+            </div>
+
+            <DatePicker.RangePicker
+              onChange={(dates) =>
+                setFilters((p) => ({
+                  ...p,
+                  startDate: dates?.[0]?.format('YYYY-MM-DD'),
+                  endDate: dates?.[1]?.format('YYYY-MM-DD'),
+                }))
+              }
+            />
+          </Space>
+
+          <Space>
+            {/* <Button
+                    icon={<FilterOutlined />}
+                    type="primary"
+                    className="bg-blue-500 hover:bg-blue-600"
+                    onClick={handleFilter}
+                  >
+                    Filter
+                  </Button> */}
+            <Button icon={<ReloadOutlined />} onClick={handleReset}>
+              Reset
+            </Button>
+          </Space>
+        </div>
         <ConfigProvider
           theme={{
             algorithm:
