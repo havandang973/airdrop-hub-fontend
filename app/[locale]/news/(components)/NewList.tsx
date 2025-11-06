@@ -15,6 +15,7 @@ import {
   PaginationCursor,
 } from '@heroui/pagination';
 export default function NewsList({ hash }: { hash?: string }) {
+  console.log('hash', hash);
   const [selectedCategory, setSelectedCategory] = useState(hash || 'all');
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
@@ -36,6 +37,12 @@ export default function NewsList({ hash }: { hash?: string }) {
   }, [page, pageSize]);
 
   const { data: posts, isLoading, refetch } = useGetPosts(filters);
+
+  useEffect(() => {
+    if (hash) {
+      setSelectedCategory(hash);
+    }
+  }, [hash]);
 
   useEffect(() => {
     setFilters((prev) => ({ ...prev, category: selectedCategory }));
@@ -83,7 +90,7 @@ export default function NewsList({ hash }: { hash?: string }) {
             if (value === 'all') {
               router.push(`/${locale}/news`);
             } else {
-              router.push(`/${locale}/news#${value}`);
+              window.location.hash = value; // ✅ Cập nhật hash trên URL
             }
           }}
         />

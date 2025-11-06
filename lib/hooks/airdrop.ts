@@ -56,10 +56,10 @@ export const useGetAirdropPostDetail = (id: number, enabled: boolean) => {
   });
 };
 
-export const useGetAirdropPosts = ({ page, size }: { page?: number, size?: number }) => {
+export const useGetAirdropPosts = (filter?: any) => {
   return useQuery({
-    queryKey: ['airdrop-posts', appConfig.version, page, size],
-    queryFn: () => getAirdropPosts(page, size),
+    queryKey: ['airdrop-posts', appConfig.version, filter],
+    queryFn: () => getAirdropPosts(filter),
     enabled: true,
     refetchIntervalInBackground: true,
     staleTime: 0,
