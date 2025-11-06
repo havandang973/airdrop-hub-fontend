@@ -117,16 +117,19 @@ export const Navbar = () => {
       // className="dark:bg-gray-900 bg-white fixed top-0 left-0 w-full z-50"
       onMenuOpenChange={(open) => setOpen(open)}
       isMenuOpen={open}
-      className="shadow-sm  dark:bg-gray-900"
+      className="shadow-sm dark:bg-gray-900"
     >
-      <NavbarContent className="basis-1/5 sm:basis-full " justify="start">
+      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
+          <NextLink
+            className="flex justify-start items-center gap-1"
+            href={`/${locale}`}
+          >
             <Logo />
             <p className="font-bold text-inherit">ACME</p>
           </NextLink>
         </NavbarBrand>
-        <ul className="hidden lg:flex gap-8 justify-start ml-10">
+        <ul className="hidden lg:flex gap-4 justify-start ml-10 w-[600px]">
           {navItems.map((item) => {
             const url =
               item.href === '/' ? `/${locale}` : `/${locale}${item.href}`;
@@ -165,7 +168,7 @@ export const Navbar = () => {
                 )}
 
                 {item.children && (
-                  <ul className="absolute left-0 pt-2 hidden group-hover:block  shadow-lg rounded-md p-2 min-w-[180px]">
+                  <ul className="absolute left-0 pt-2 hidden group-hover:block bg-white dark:bg-gray-900 shadow-lg rounded-md p-2 min-w-[180px]">
                     {item.children.map((child: any) => {
                       const childUrl =
                         child.href === '/'
@@ -202,12 +205,12 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarContent
-        className="hidden lg:flex basis-1/5 sm:basis-full "
+        className="hidden lg:flex basis-1/5 sm:basis-full"
         justify="end"
       >
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden lg:flex gap-2">
-          <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
+          {/* <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
             <TwitterIcon className="text-default-500" />
           </Link>
           <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
@@ -215,7 +218,7 @@ export const Navbar = () => {
           </Link>
           <Link isExternal aria-label="Github" href={siteConfig.links.github}>
             <GithubIcon className="text-default-500" />
-          </Link>
+          </Link> */}
 
           <Select
             // isOpen={open}
@@ -225,7 +228,7 @@ export const Navbar = () => {
             // popoverProps={{
             //   onMouseLeave: () => setOpen(false),
             // }}
-            className="w-38"
+            className="w-38 pointer-events-none"
             classNames={{
               trigger:
                 'bg-transparent border-none shadow-none hover:bg-transparent data-[hover=true]:bg-transparent',
@@ -285,6 +288,7 @@ export const Navbar = () => {
           popoverProps={{
             onMouseLeave: () => setOpen(false),
           }}
+          className="pointer-events-none"
           classNames={{
             trigger:
               'bg-transparent border-none shadow-none hover:bg-transparent data-[hover=true]:bg-transparent',

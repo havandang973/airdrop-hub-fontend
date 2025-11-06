@@ -1,9 +1,9 @@
 'use client';
 
-import { Tabs, Spin } from 'antd';
 import { IconStack } from '@tabler/icons-react';
 import { useGetCategories } from '@/lib/hooks/category';
-
+import { Spinner } from '@heroui/spinner';
+import { Tabs, Tab } from '@heroui/tabs';
 export default function NewsFilterTabs({
   value,
   onChange,
@@ -16,7 +16,7 @@ export default function NewsFilterTabs({
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-8">
-        <Spin />
+        <Spinner />
       </div>
     );
   }
@@ -25,26 +25,38 @@ export default function NewsFilterTabs({
   const tabs = [
     { key: 'all', label: 'Tất cả', icon: <IconStack size={18} /> },
     ...(categories?.map((cat: any) => ({
-      key: cat.slug || cat.name, // dùng slug nếu có
+      key: cat.slug || cat.name,
       label: cat.name,
       icon: <IconStack size={18} />,
     })) || []),
   ];
 
   return (
-    <Tabs
-      centered
-      items={tabs.map((item) => ({
-        key: item.key,
-        label: (
-          <div className="flex items-center gap-1">
-            {item.icon}
-            {item.label}
-          </div>
-        ),
-      }))}
-      activeKey={value}
-      onChange={onChange}
-    />
+    <div className="flex justify-center">
+      <Tabs
+        aria-label="News categories"
+        selectedKey={value}
+        onSelectionChange={(key: any) => onChange(key as string)}
+        color="primary"
+        variant="underlined"
+        classNames={{
+          tabList: 'gap-6',
+          tab: 'text-gray-700 dark:text-gray-300 data-[selected=true]:text-blue-600 dark:data-[selected=true]:text-blue-400',
+          cursor: 'bg-blue-600 dark:bg-blue-400',
+        }}
+      >
+        {tabs.map((item) => (
+          <Tab
+            key={item.key}
+            title={
+              <div className="flex items-center gap-1">
+                {item.icon}
+                <span>{item.label}</span>
+              </div>
+            }
+          />
+        ))}
+      </Tabs>
+    </div>
   );
 }

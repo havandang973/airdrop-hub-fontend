@@ -1,24 +1,30 @@
 'use client';
-import Image from 'next/image';
+import { Card, CardHeader, CardBody, CardFooter } from '@heroui/card';
+import { Image } from '@heroui/image';
 import { IconCalendar } from '@tabler/icons-react';
 
 export default function NewsCard({ post }: { post: any }) {
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow hover:shadow-lg transition-all h-full flex flex-col">
-      <div className="aspect-[16/9] w-full overflow-hidden">
-        <img
-          src={post.image}
-          alt={post.title}
-          className="object-cover w-full h-full"
-        />
-      </div>
-
-      <div className="p-4 flex flex-col flex-grow">
-        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 mb-2">
+    <Card
+      isPressable
+      className="bg-white dark:bg-gray-900 hover:shadow-lg dark:hover:shadow-blue-500/10 transition-all flex flex-col"
+    >
+      <Image
+        removeWrapper
+        src={post.image}
+        alt={post.title}
+        className="object-cover aspect-[16/9] w-full rounded-t-lg"
+      />
+      <CardBody className="flex flex-col flex-grow p-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 line-clamp-2 mb-2">
           {post.title}
         </h3>
-        <p className="text-sm text-gray-500 mt-auto">{post.date}</p>
-      </div>
-    </div>
+
+        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-auto">
+          <IconCalendar size={16} className="mr-1" />
+          {post.date}
+        </div>
+      </CardBody>
+    </Card>
   );
 }

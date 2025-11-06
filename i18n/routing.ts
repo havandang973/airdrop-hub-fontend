@@ -3,7 +3,7 @@ import { defineRouting } from 'next-intl/routing';
 
 export const routing = defineRouting({
     locales: ['en', 'vi'],
-    defaultLocale: 'en',
+    defaultLocale: 'vi',
     localePrefix: 'always',
 
     // 🔥 Dịch đường dẫn ở đây:
@@ -27,6 +27,10 @@ export const routing = defineRouting({
         '/airdrop': {
             en: '/airdrop',
             vi: '/airdrop',
+        },
+        '/about': {
+            en: '/about',
+            vi: '/gioi-thieu',
         },
     },
 });

@@ -30,11 +30,11 @@ export const viewport: Viewport = {
 };
 const navItems = [
   {
-    name: 'Home',
+    name: 'Trang chủ',
     href: '/',
   },
   {
-    name: 'Market',
+    name: 'Thị trường',
     href: '/market',
   },
   {
@@ -42,11 +42,11 @@ const navItems = [
     href: '/airdrop',
   },
   {
-    name: 'News',
+    name: 'Tin tức',
     href: '/news',
   },
   {
-    name: 'About',
+    name: 'Giới thiệu',
     href: '/about',
   },
 ];
@@ -75,7 +75,7 @@ export default function RootLayout({
               storageKey: 'theme',
             }}
           >
-            <div className="relative flex flex-col h-screen">
+            <div className="relative flex flex-col">
               <Navbar />
 
               <main className="flex justify-center items-start gap-6 px-4">
@@ -99,16 +99,16 @@ export default function RootLayout({
                   <div className="flex justify-center text-black dark:text-white">
                     <NextLink
                       className="flex justify-start items-center gap-1"
-                      href="/"
+                      href={`/${locale}`}
                     >
                       <Logo size={36} />
                       <p className="font-bold text-xl">ACME</p>
                     </NextLink>
                   </div>
                   <p className="mx-auto md:text-base text-sm mt-6 max-w-md text-center leading-relaxed text-gray-500 dark:text-gray-400">
-                    Explore Crypto Markets, Airdrops & News in one place.
+                    Khám phá thị trường Crypto, Airdrop và Tin tức tại một nơi.
                     <br />
-                    Stay updated – seize opportunities early.
+                    Luôn cập nhật – nắm bắt cơ hội sớm.
                   </p>
 
                   <ul className="md:mt-12 mt-8 md:text-base text-sm flex flex-wrap justify-center gap-6 md:gap-8 lg:gap-12">

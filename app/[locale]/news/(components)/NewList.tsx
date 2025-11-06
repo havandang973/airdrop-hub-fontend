@@ -4,12 +4,16 @@ import { useEffect, useState } from 'react';
 import NewsSearchBar from './NewsSearchBar';
 import NewsFilterTabs from './NewsFilterTabs';
 import NewsCard from './NewsCard';
-import { Spin, Pagination } from 'antd'; // ✅ thêm Pagination
+import { Spin } from 'antd';
 import { useGetPosts } from '@/lib/hooks/post';
 import { Link } from '@heroui/link';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
-
+import {
+  Pagination,
+  PaginationItem,
+  PaginationCursor,
+} from '@heroui/pagination';
 export default function NewsList({ hash }: { hash?: string }) {
   const [selectedCategory, setSelectedCategory] = useState(hash || 'all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,7 +21,7 @@ export default function NewsList({ hash }: { hash?: string }) {
   const locale = useLocale();
 
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(9); // ✅ hiển thị 9 bài mỗi trang
+  const [pageSize, setPageSize] = useState(9);
 
   const [filters, setFilters] = useState({
     title: '',
@@ -40,7 +44,7 @@ export default function NewsList({ hash }: { hash?: string }) {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-[300px]">
+      <div className="flex justify-center items-center h-[300px] dark:bg-gray-900">
         <Spin size="large" />
       </div>
     );
@@ -48,9 +52,11 @@ export default function NewsList({ hash }: { hash?: string }) {
 
   if (!posts?.data || posts.data.length === 0) {
     return (
-      <section className="w-full mx-auto px-4 py-10 text-center text-gray-500">
-        <h1 className="text-2xl font-semibold mb-4">No News Found</h1>
-        <p>There are currently no articles available.</p>
+      <section className="w-full mx-auto px-4 py-10 text-center text-gray-500 dark:text-gray-400 dark:bg-gray-900">
+        <h1 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">
+          Không có bài viết nào
+        </h1>
+        <p>Hiện chưa có bài viết được đăng tải.</p>
       </section>
     );
   }
@@ -60,12 +66,14 @@ export default function NewsList({ hash }: { hash?: string }) {
   );
 
   return (
-    <section className="mx-auto px-4 py-10">
-      <h1 className="text-center text-3xl font-semibold mb-6">
-        <span className="text-blue-600">News</span>
+    <section className="mx-auto px-4 py-10 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      <h1 className="text-center text-3xl font-semibold mb-6 text-gray-900 dark:text-white">
+        <span className="text-blue-600 dark:text-blue-400">Tin Tức</span>
       </h1>
 
-      <NewsSearchBar value={searchTerm} onChange={setSearchTerm} />
+      <div className="mb-4">
+        <NewsSearchBar value={searchTerm} onChange={setSearchTerm} />
+      </div>
 
       <div className="mt-8 mb-6">
         <NewsFilterTabs
@@ -81,7 +89,7 @@ export default function NewsList({ hash }: { hash?: string }) {
         />
       </div>
 
-      {/* Grid hiển thị bài viết */}
+      {/* ✅ Grid hiển thị bài viết */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filteredNews.map((post: any) => (
           <Link
@@ -107,13 +115,14 @@ export default function NewsList({ hash }: { hash?: string }) {
       {/* ✅ Pagination */}
       <div className="flex justify-center mt-10">
         <Pagination
-          current={page}
-          pageSize={pageSize}
-          total={posts.pagination?.total || 0}
-          showSizeChanger
-          onChange={(page, size) => {
-            setPage(page);
-            setPageSize(size);
+          total={Math.ceil((posts.pagination?.total || 0) / pageSize)}
+          page={page}
+          onChange={(newPage) => setPage(newPage)}
+          showControls
+          color="primary"
+          classNames={{
+            item: 'dark:bg-gray-800 dark:text-gray-200',
+            cursor: 'dark:bg-blue-500 dark:text-white',
           }}
         />
       </div>

@@ -18,14 +18,14 @@ const FundingTabs = (props: { defaultActiveKey: string }) => {
         <div className="whitespace-normal break-words p-3 flex flex-col justify-between rounded-md min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-gray-900 dark:text-gray-100">
-              Market Overview
+              Tổng quan thị trường
             </span>
-            <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm">
+            {/* <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm">
               <span>30D</span>
-            </div>
+            </div> */}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 mt-3">
+          {/* <div className="grid grid-cols-2 gap-2 mt-3">
             <div className="bg-slate-100 dark:bg-gray-800 p-2 rounded-md">
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Funding Rounds Total
@@ -59,7 +59,7 @@ const FundingTabs = (props: { defaultActiveKey: string }) => {
                 $3-10M
               </span>
             </p>
-          </div>
+          </div> */}
         </div>
       ),
       children: <MarketTable />,
@@ -70,14 +70,14 @@ const FundingTabs = (props: { defaultActiveKey: string }) => {
         <div className="whitespace-normal break-words p-3 flex flex-col justify-between rounded-md min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-gray-900 dark:text-gray-100">
-              Airdrop List
+              Danh sách Airdrop
             </span>
-            <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm">
+            {/* <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm">
               <span>Active</span>
-            </div>
+            </div> */}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 mt-3">
+          {/* <div className="grid grid-cols-2 gap-2 mt-3">
             <div className="bg-slate-100 dark:bg-gray-800 p-2 rounded-md">
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Ongoing Airdrops
@@ -101,7 +101,7 @@ const FundingTabs = (props: { defaultActiveKey: string }) => {
               Most Popular:{' '}
               <span className="text-blue-500">Solana Airdrop</span>
             </p>
-          </div>
+          </div> */}
         </div>
       ),
       children: <AirdropTable />,
@@ -112,14 +112,14 @@ const FundingTabs = (props: { defaultActiveKey: string }) => {
         <div className="whitespace-normal break-words p-3 rounded-md  flex flex-col justify-between min-h-48 border border-gray-200 dark:border-gray-700 transition cursor-pointer">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-gray-900 dark:text-gray-100">
-              Latest News
+              Tin tức
             </span>
-            <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm">
+            {/* <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm">
               <span>Today</span>
-            </div>
+            </div> */}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 mt-3">
+          {/* <div className="grid grid-cols-2 gap-2 mt-3">
             <div className="bg-slate-100 dark:bg-gray-800 p-2 rounded-md">
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Trending
@@ -142,7 +142,7 @@ const FundingTabs = (props: { defaultActiveKey: string }) => {
             <p className="text-gray-500 dark:text-gray-400">
               Highlight: <span className="text-blue-500">BTC surges $70k</span>
             </p>
-          </div>
+          </div> */}
         </div>
       ),
       children: <NewsTable />,
@@ -180,6 +180,7 @@ const FundingTabs = (props: { defaultActiveKey: string }) => {
           overflow-x: auto;
         }
         .custom-tabs .ant-tabs-tab {
+          padding: 0;
           flex: 1; /* chia đều */
           justify-content: center;
           max-width: none !important;

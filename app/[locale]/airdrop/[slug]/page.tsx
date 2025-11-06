@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, Card, Spin } from 'antd';
+import { Avatar, Spin } from 'antd';
 import { Avatar as HeroAvatar, AvatarGroup } from '@heroui/avatar';
 import { useEffect, useState } from 'react';
 import { useGetAirdrop, useGetAirdropPost } from '@/lib/hooks/airdrop';
@@ -9,6 +9,10 @@ import { IconPointFilled } from '@tabler/icons-react';
 import { Tooltip } from '@heroui/tooltip';
 import { Link } from '@heroui/link';
 import { useLocale } from 'next-intl';
+import { ScrollShadow } from '@heroui/scroll-shadow';
+import { Divider } from '@heroui/divider';
+import { Card, CardBody, CardHeader } from '@heroui/card';
+import { Chip } from '@heroui/chip';
 
 interface AirdropPost {
   id: number;
@@ -22,6 +26,7 @@ export default function AirdropDetailPage() {
   const params = useParams();
   const locale = useLocale();
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+  const [zoomSrc, setZoomSrc] = useState<string | null>(null);
 
   // Lấy dữ liệu Airdrop chính
   const { data: airdrop, isLoading } = useGetAirdrop(slug as string, !!slug);
@@ -56,17 +61,27 @@ export default function AirdropDetailPage() {
   return (
     <div className="space-y-10">
       {/* Header */}
+      <Link
+        href={`/${locale}/airdrop`}
+        className="text-blue-500 text-sm inline-block mb-5"
+      >
+        ← Airdrop
+      </Link>
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
         {/* Logo + Tên airdrop */}
+
         <div className="flex gap-5 items-center">
-          <Avatar
-            size={{ xs: 60, sm: 80, md: 80, lg: 100, xl: 100, xxl: 100 }}
-            src={
-              selectedAirdrop?.logo ??
-              'https://img.cryptorank.io/coins/base_vol1759229258847.png'
-            }
-          />
-          <div className="flex flex-col">
+          <div>
+            <Avatar
+              size={{ xs: 60, sm: 80, md: 80, lg: 100, xl: 100, xxl: 100 }}
+              src={
+                selectedAirdrop?.logo ??
+                'https://img.cryptorank.io/coins/base_vol1759229258847.png'
+              }
+            />
+          </div>
+
+          <div className="flex flex-col w-[600px]">
             <span className="font-semibold text-xl md:text-2xl">
               {selectedAirdrop?.name}
             </span>
@@ -127,33 +142,44 @@ export default function AirdropDetailPage() {
         ) : (
           <div className="flex flex-col lg:flex-row gap-6">
             {/* LEFT - Danh sách post */}
-            <div className="w-full lg:w-[30%] !space-y-4 sticky top-5 h-fit">
-              {airdropPosts.map((post: any) => (
+            <ScrollShadow
+              orientation="horizontal"
+              className="flex gap-3 w-full overflow-x-auto lg:w-[30%] lg:flex-col h-fit max-h-[80vh] lg:sticky top-5"
+            >
+              {airdropPosts.map((post) => (
                 <Card
                   key={post.id}
-                  hoverable
-                  onClick={() => {
+                  isPressable
+                  onPress={() => {
                     const el = document.getElementById(`post-${post.id}`);
                     if (el)
                       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }}
-                  className={`!border-gray-200 border transition-all hover:!border-blue-400 ${
+                  className={`min-w-[300px] transition-all border border-default-200 hover:border-primary p-2  ${
                     post.status === 'Closed' ? 'opacity-50' : ''
                   }`}
                 >
-                  <div className="flex flex-col gap-2">
+                  <CardHeader className="flex flex-col items-start gap-5">
                     <h3 className="font-semibold text-lg">{post.name}</h3>
-                    <div className="flex justify-between text-gray-500 mt-1">
-                      <div className="flex items-center">
+                    <div className="flex justify-between items-center w-full text-sm text-default-500">
+                      <div className="flex items-center gap-1">
                         <IconPointFilled
-                          size={18}
+                          size={16}
                           className={
-                            post.status === 'Open'
-                              ? 'text-green-500'
-                              : 'text-red-500'
+                            post.status === 'Completed'
+                              ? 'text-success'
+                              : 'text-danger'
                           }
                         />
-                        <span>{post.status ?? 'N/A'}</span>
+                        <Chip
+                          size="sm"
+                          color={
+                            post.status === 'Completed' ? 'success' : 'danger'
+                          }
+                          variant="flat"
+                        >
+                          {post.status ?? 'N/A'}
+                        </Chip>
                       </div>
                       <span>
                         📅{' '}
@@ -162,27 +188,61 @@ export default function AirdropDetailPage() {
                           : 'No date'}
                       </span>
                     </div>
-                  </div>
+                  </CardHeader>
                 </Card>
               ))}
-            </div>
+            </ScrollShadow>
 
             {/* RIGHT - Nội dung post */}
             <div className="w-full lg:w-[70%] space-y-6">
-              {airdropPosts.map((post: any) => (
-                <div
+              {airdropPosts.map((post) => (
+                <Card
                   key={post.id}
                   id={`post-${post.id}`}
-                  className={`bg-white p-5 rounded-xl border border-gray-200 shadow-sm scroll-mt-24 ${
+                  className={`border border-default-200 shadow-sm scroll-mt-24 p-4 ${
                     post.status === 'Closed' ? 'opacity-50' : ''
                   }`}
                 >
-                  <h2 className="text-xl font-semibold mb-3">{post.name}</h2>
-                  <div
-                    className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: post.content || '' }}
-                  />
-                </div>
+                  <CardHeader>
+                    <h2 className="text-xl font-semibold">{post.name}</h2>
+                  </CardHeader>
+                  <Divider />
+                  <CardBody>
+                    <div
+                      className="prose prose-sm dark:prose-invert max-w-none"
+                      dangerouslySetInnerHTML={{ __html: post.content || '' }}
+                      onClick={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (target.tagName === 'IMG') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setZoomSrc(target.src);
+                        }
+                      }}
+                    />
+                  </CardBody>
+
+                  {/* Overlay Zoom Image */}
+                  {zoomSrc && (
+                    <div
+                      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/10 backdrop-blur-sm cursor-zoom-out transition-opacity duration-300"
+                      onClick={() => setZoomSrc(null)}
+                    >
+                      <img
+                        src={zoomSrc}
+                        alt="Zoomed"
+                        className="max-w-[80vw] max-h-[80vh] rounded-xl shadow-2xl object-contain transform scale-100 transition-transform duration-300 ease-in-out hover:scale-[1.02]"
+                      />
+                      {/* nút đóng nhỏ góc trên phải */}
+                      <button
+                        className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white rounded-full p-2"
+                        onClick={() => setZoomSrc(null)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+                </Card>
               ))}
             </div>
           </div>

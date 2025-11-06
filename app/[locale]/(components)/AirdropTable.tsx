@@ -1,17 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import {
-  Table,
-  ConfigProvider,
-  theme,
-  Tag,
-  Input,
-  Select,
-  DatePicker,
-  Button,
-  Space,
-} from 'antd';
+import { Table, ConfigProvider, theme, Tag } from 'antd';
 import { useTheme } from 'next-themes';
 import { useLocale } from 'next-intl';
 import { useGetAirdrops } from '@/lib/hooks/airdrop';
@@ -21,8 +11,13 @@ import { toNumber } from 'lodash';
 import { Avatar, AvatarGroup } from '@heroui/avatar';
 import { Tooltip } from '@heroui/tooltip';
 import { Time } from '@/lib/helpers/Time';
+import { Input } from '@heroui/input';
+import { SearchIcon } from '@/components/icons';
+import { Select, SelectItem } from '@heroui/select';
+import { DateRangePicker } from '@heroui/date-picker';
+import { Button } from '@heroui/button';
 
-const { RangePicker } = DatePicker;
+// const { RangePicker } = DatePicker;
 
 const AirdropTable = () => {
   const themeNext = useTheme();
@@ -55,9 +50,10 @@ const AirdropTable = () => {
   // --- Columns ---
   const columns: any = [
     {
-      title: 'Name',
+      title: 'Tên',
       dataIndex: 'name',
       key: 'name',
+      fixed: 'left',
       sorter: (a: any, b: any) => a.name.localeCompare(b.name),
       sortOrder: sortedInfo.columnKey === 'name' ? sortedInfo.order : null,
       render: (text: string, record: any) => (
@@ -77,7 +73,7 @@ const AirdropTable = () => {
       ),
     },
     {
-      title: 'Raise',
+      title: 'Vốn huy động',
       dataIndex: 'raise',
       key: 'raise',
       align: 'right',
@@ -87,7 +83,7 @@ const AirdropTable = () => {
       render: (text: string) => <span>$ {text} M</span>,
     },
     {
-      title: 'Status',
+      title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
       sorter: (a: any, b: any) =>
@@ -100,7 +96,7 @@ const AirdropTable = () => {
       ),
     },
     {
-      title: 'Funds and Investors',
+      title: 'Quỹ và nhà đầu tư',
       dataIndex: 'funds',
       key: 'funds',
       render: (_: any, record: any) => {
@@ -128,7 +124,7 @@ const AirdropTable = () => {
       },
     },
     {
-      title: 'Date',
+      title: 'Thời gian',
       dataIndex: 'date',
       key: 'date',
       sorter: (a: any, b: any) =>
@@ -160,84 +156,110 @@ const AirdropTable = () => {
   return (
     <div>
       {/* Filters */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl p-3 mb-5 bg-white dark:bg-[#1f1f1f] shadow-sm">
-        <Space wrap size="middle">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl p-4 mb-5 bg-white dark:bg-[#1f1f1f] shadow-sm">
+        {/* LEFT - Filters */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Search */}
           <Input
-            placeholder="Search name..."
-            prefix={<SearchOutlined />}
+            type="text"
+            placeholder="Nhập tên..."
+            startContent={<SearchIcon className="text-gray-500" size={18} />}
             value={filters.name}
             onChange={(e) =>
               setFilters((p) => ({ ...p, name: e.target.value }))
             }
-            style={{ width: 200 }}
+            className="w-[200px]"
+            variant="bordered"
+            classNames={{ inputWrapper: 'rounded-md border-1' }}
           />
-          <Select
-            placeholder="Status"
-            allowClear
-            value={filters.status}
-            onChange={(v) => setFilters((p) => ({ ...p, status: v }))}
-            style={{ width: 140 }}
-            options={[
-              { value: 'active', label: 'Active' },
-              { value: 'inactive', label: 'Inactive' },
-            ]}
-          />
+
+          {/* Range input */}
           <div className="flex items-center">
             <Input
               type="number"
-              placeholder="Start raise"
-              min={0}
-              value={String(filters.minRaise)}
+              placeholder="Vốn từ"
+              value={filters.minRaise?.toString() || ''}
               onChange={(e) =>
                 setFilters((p) => ({ ...p, minRaise: Number(e.target.value) }))
               }
-              className="!rounded-none !rounded-l-md"
+              className="w-[140px]"
+              variant="bordered"
+              classNames={{
+                inputWrapper: 'rounded-md rounded-r-none border-1',
+              }}
             />
             <Input
               type="number"
-              placeholder="End raise"
-              min={0}
-              value={String(filters.maxRaise)}
+              placeholder="Vốn đến"
+              value={filters.maxRaise?.toString() || ''}
               onChange={(e) =>
                 setFilters((p) => ({ ...p, maxRaise: Number(e.target.value) }))
               }
-              className="!rounded-none !rounded-r-md"
+              className="w-[140px]"
+              variant="bordered"
+              classNames={{
+                inputWrapper: 'rounded-md rounded-l-none border-1 ',
+              }}
             />
           </div>
 
+          {/* Status */}
+          <Select
+            labelPlacement="outside"
+            placeholder="Trạng thái"
+            selectedKeys={filters.status ? [filters.status] : []}
+            onChange={(e) =>
+              setFilters((p) => ({ ...p, status: e.target.value }))
+            }
+            className="w-[140px]"
+            variant="bordered"
+            classNames={{ trigger: 'rounded-md border-1' }}
+          >
+            <SelectItem key="active">Active</SelectItem>
+            <SelectItem key="inactive">Inactive</SelectItem>
+          </Select>
+
+          {/* Fund */}
           <Input
-            placeholder="Search fund..."
+            placeholder="Nhập quỹ..."
             value={filters.fund}
             onChange={(e) =>
               setFilters((p) => ({ ...p, fund: e.target.value }))
             }
-            style={{ width: 160 }}
+            className="w-[160px]"
+            variant="bordered"
+            classNames={{ inputWrapper: 'rounded-md border-1' }}
           />
 
-          <RangePicker
-            onChange={(dates) =>
+          {/* Date Range */}
+          <DateRangePicker
+            // label="Thời gian"
+            variant="bordered"
+            labelPlacement="outside-left"
+            className="w-[300px]"
+            onChange={(range) =>
               setFilters((p) => ({
                 ...p,
-                startDate: dates?.[0]?.format('YYYY-MM-DD'),
-                endDate: dates?.[1]?.format('YYYY-MM-DD'),
+                startDate: range?.start?.toString() || '',
+                endDate: range?.end?.toString() || '',
               }))
             }
+            classNames={{ inputWrapper: 'rounded-md border-1' }}
           />
-        </Space>
+        </div>
 
-        <Space>
-          {/* <Button
-            icon={<FilterOutlined />}
-            type="primary"
-            className="bg-blue-500 hover:bg-blue-600"
-            onClick={handleFilter}
+        {/* RIGHT - Buttons */}
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="solid"
+            color="primary"
+            className="rounded-md border-1"
+            onPress={handleReset}
           >
-            Filter
-          </Button> */}
-          <Button icon={<ReloadOutlined />} onClick={handleReset}>
             Reset
           </Button>
-        </Space>
+        </div>
       </div>
 
       {/* Table */}
@@ -265,7 +287,7 @@ const AirdropTable = () => {
             },
           }}
           onChange={handleChange}
-          scroll={{ x: 700 }}
+          scroll={{ x: 800 }}
         />
       </ConfigProvider>
     </div>

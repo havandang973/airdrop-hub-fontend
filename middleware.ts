@@ -40,6 +40,7 @@ export function middleware(req: NextRequest) {
 
         return NextResponse.next();
     }
+    return intlMiddleware(req);
 }
 
 export default middleware;

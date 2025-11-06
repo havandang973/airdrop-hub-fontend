@@ -8,53 +8,62 @@ import { useLocale } from 'next-intl';
 import { useState } from 'react';
 
 export default function Home() {
-  const [filters, setFilters] = useState({
+  const [filters] = useState({
     title: '',
     category: 'all',
     visibility: 1,
     page: 1,
     size: 10,
   });
-  const { data: posts, isLoading } = useGetPosts(filters);
 
+  const { data: posts, isLoading } = useGetPosts(filters);
   const locale = useLocale();
-  // ✅ Lọc bài viết
+
   const heroPosts: any = posts?.data
-    .filter((p: any) => p.pin_to_home && !p.pin)
-    .slice(0, 5);
+    ?.filter((p: any) => p.pin_to_home && !p.pin)
+    ?.slice(0, 5);
+
   const carouselPosts = posts?.data
-    .filter((p: any) => p.pin || p.pin_to_home)
-    .sort(
+    ?.filter((p: any) => p.pin || p.pin_to_home)
+    ?.sort(
       (a: any, b: any) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    ); // sắp xếp bài mới nhất lên đầu
+    );
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-[300px] text-gray-500 dark:text-gray-400">
+        Loading...
+      </div>
+    );
 
   return (
-    <div className="container mx-auto space-y-8">
-      {/* Hero section */}
+    <div className="container mx-auto space-y-6 px-4">
+      {/* 📰 Hero section */}
       {heroPosts?.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {/* Bài lớn */}
           <Link
             href={
               heroPosts[0].category?.name
-                ? `/${locale}/news/${heroPosts[0].category.name}/${heroPosts[0].slug}` // có category
-                : `/${locale}/news/${heroPosts[0].slug}` // không có category
+                ? `/${locale}/news/${heroPosts[0].category.name}/${heroPosts[0].slug}`
+                : `/${locale}/news/${heroPosts[0].slug}`
             }
-            key={heroPosts.id}
-            className="md:col-span-3 relative rounded-2xl overflow-hidden"
+            key={heroPosts[0].id}
+            className="md:col-span-3 relative rounded-2xl overflow-hidden group"
           >
             <Image
               src={heroPosts[0].thumbnail}
               alt={heroPosts[0].title}
               width={800}
               height={400}
-              className="object-cover w-full h-[400px]"
+              className="object-cover w-full h-[400px] transition-transform duration-500 group-hover:scale-105"
             />
-            <div className="w-full absolute bottom-0 p-6 bg-gradient-to-t from-black/80 to-transparent text-white">
-              <h2 className="text-2xl font-semibold">{heroPosts[0].title}</h2>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            <div className="absolute bottom-0 p-6 text-white">
+              <h2 className="text-2xl font-semibold line-clamp-2">
+                {heroPosts[0].title}
+              </h2>
             </div>
           </Link>
 
@@ -64,21 +73,24 @@ export default function Home() {
               <Link
                 href={
                   post.category?.name
-                    ? `/${locale}/news/${post.category.name}/${post.slug}` // có category
-                    : `/${locale}/news/${post.slug}` // không có category
+                    ? `/${locale}/news/${post.category.name}/${post.slug}`
+                    : `/${locale}/news/${post.slug}`
                 }
                 key={post.id}
-                className="relative rounded-2xl overflow-hidden"
+                className="relative rounded-2xl overflow-hidden group"
               >
                 <Image
                   src={post.thumbnail}
                   alt={post.title}
                   width={400}
                   height={200}
-                  className="object-cover w-full h-[190px]"
+                  className="object-cover w-full h-[190px] transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="w-full absolute bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
-                  <h3 className="text-sm font-medium">{post.title}</h3>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                <div className="absolute bottom-0 p-4 text-white">
+                  <h3 className="text-sm font-medium line-clamp-2">
+                    {post.title}
+                  </h3>
                 </div>
               </Link>
             ))}
@@ -86,21 +98,16 @@ export default function Home() {
         </div>
       )}
 
-      <Divider />
+      <Divider className="dark:border-gray-700" />
 
-      {/* Carousel */}
+      {/* 🌀 Carousel section */}
       {carouselPosts?.length > 0 && (
         <ConfigProvider
           theme={{
-            components: {
-              Carousel: {
-                arrowSize: 30,
-                arrowOffset: 20,
-                dotHeight: 5,
-                dotWidth: 20,
-                dotGap: 8,
-                dotActiveWidth: 32,
-              },
+            token: {
+              colorBgContainer: '#0f172a', // dark slate
+              colorText: '#e2e8f0',
+              colorPrimary: '#006fee',
             },
           }}
         >
@@ -113,14 +120,14 @@ export default function Home() {
             autoplay
             responsive={[
               {
-                breakpoint: 768, // dưới 768px (mobile)
+                breakpoint: 768,
                 settings: {
                   slidesToShow: 1,
                   slidesToScroll: 1,
                 },
               },
               {
-                breakpoint: 1024, // dưới 1024px (tablet)
+                breakpoint: 1024,
                 settings: {
                   slidesToShow: 2,
                   slidesToScroll: 1,
@@ -132,35 +139,38 @@ export default function Home() {
               <Link
                 href={
                   post.category?.name
-                    ? `/${locale}/news/${post.category.name}/${post.slug}` // có category
-                    : `/${locale}/news/${post.slug}` // không có category
+                    ? `/${locale}/news/${post.category.name}/${post.slug}`
+                    : `/${locale}/news/${post.slug}`
                 }
                 key={post.id}
                 className="px-2 pb-2"
               >
-                <div className="rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-200">
+                <div className="rounded-2xl overflow-hidden bg-white dark:bg-gray-900 dark:border-gray-800 shadow-sm hover:shadow-lg transition-all border border-gray-200 group">
                   <Image
                     src={post.thumbnail}
                     alt={post.title}
                     width={400}
                     height={200}
-                    className="object-fill w-full h-[200px]"
+                    className="object-cover w-full h-[200px] transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="p-3">
-                    <h4 className="font-semibold text-base">{post.title}</h4>
+                    <h4 className="font-semibold text-base text-gray-800 dark:text-gray-100 line-clamp-2">
+                      {post.title}
+                    </h4>
                   </div>
                 </div>
               </Link>
             ))}
           </Carousel>
+
+          {/* ✅ Style dark mode cho dots */}
           <style jsx global>{`
             .ant-carousel .slick-dots li button {
-              background: #d1d5db !important;
+              background: #94a3b8 !important;
               opacity: 1 !important;
             }
-            .ant-carousel .slick-dots li.slick-active::after {
+            .ant-carousel .slick-dots li.slick-active button {
               background: #006fee !important;
-              border-radius: 8px !important;
             }
             .ant-carousel .slick-dots-bottom {
               bottom: -20px !important;

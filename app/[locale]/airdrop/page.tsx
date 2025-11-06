@@ -34,7 +34,7 @@ export default function Page() {
               class: 'text-3xl md:text-5xl leading-snug md:leading-tight',
             })}
           >
-            Explore&nbsp;
+            Khám Phá&nbsp;
           </span>
           <span
             className={title({
@@ -49,7 +49,8 @@ export default function Page() {
               class: 'block text-2xl md:text-4xl leading-snug md:leading-tight',
             })}
           >
-            Discover top crypto airdrops <br /> in one place.
+            Khám Phá Các Airdrops <br />
+            Tại 1 Nơi.
           </span>
 
           <div
@@ -57,7 +58,7 @@ export default function Page() {
               class: 'mt-2 text-gray-600 dark:text-gray-400',
             })}
           >
-            Stay updated – don’t miss your chance to claim free tokens.
+            Hãy cập nhật thông tin – đừng bỏ lỡ cơ hội nhận token miễn phí.
           </div>
 
           <div className="mt-6">
@@ -71,7 +72,7 @@ export default function Page() {
               })}
               href={siteConfig.links.docs}
             >
-              Start now
+              Bắt đầu ngay
             </Link>
           </div>
         </div>
