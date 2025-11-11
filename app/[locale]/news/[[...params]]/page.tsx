@@ -23,7 +23,6 @@ export default function NewsPage() {
   }
 
   if (!params?.params || params?.params?.length === 0) {
-    console.log('ok');
     return <NewsList />;
   }
 

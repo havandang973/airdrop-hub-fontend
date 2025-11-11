@@ -17,28 +17,23 @@ import NextLink from 'next/link';
 import clsx from 'clsx';
 import { siteConfig } from '@/config/site';
 import { ThemeSwitch } from '@/components/theme-switch';
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-  Logo,
-} from '@/components/icons';
+import { SearchIcon, Logo } from '@/components/icons';
 import { useLocale } from 'next-intl';
 import { useTranslations } from 'use-intl';
 import { Select, SelectItem } from '@heroui/select';
 import { Avatar } from '@heroui/avatar';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-
 import {
-  IconDroplet,
-  IconGraph,
-  IconHome,
-  IconInfoCircle,
-  IconNews,
+  IconHome2,
+  IconTrendingUp,
+  IconGift,
+  IconArticle,
+  IconUserQuestion,
+  IconCoin,
 } from '@tabler/icons-react';
+
+import { useGetCategories } from '@/lib/hooks/category';
 
 type NavItem = {
   label: string;
@@ -67,49 +62,52 @@ export const Navbar = () => {
   const locale = useLocale();
   const trans = useTranslations();
   const router = useRouter();
+  const { data: categories, isLoading } = useGetCategories(true);
+
+  const categoryIcons: Record<string, JSX.Element> = {
+    Airdrop: <IconGift size={16} />,
+    Crypto: <IconCoin size={16} />,
+    Market: <IconTrendingUp size={16} className="text-green-500" />,
+  };
   const navItems: NavItem[] = [
     {
       label: trans('Home'),
       href: '/',
-      icon: <IconHome size={16} />,
+      icon: <IconHome2 size={16} />,
     },
     {
       label: trans('Market'),
       href: '/market',
-      icon: <IconGraph size={16} />,
-      children: [
-        {
-          label: trans('Spot'),
-          href: '/market/spot',
-          icon: <IconGraph size={16} />,
-        },
-        {
-          label: trans('Futures'),
-          href: '/market/futures',
-          icon: <IconGraph size={16} />,
-        },
-      ],
+      icon: <IconTrendingUp size={16} />,
     },
     {
       label: trans('Airdrop'),
       href: '/airdrop',
-      icon: <IconDroplet size={16} />,
+      icon: <IconGift size={16} />,
     },
     {
       label: trans('News'),
       href: '/news',
-      icon: <IconNews size={16} />,
+      icon: <IconArticle size={16} />,
+      children: [
+        ...(categories?.map((cat: any) => ({
+          label: cat.name,
+          href: `/news#${cat.name}`,
+          icon: categoryIcons[cat.name] || <IconArticle size={16} />,
+        })) || []),
+      ],
     },
     {
       label: trans('About'),
       href: '/about',
-      icon: <IconInfoCircle size={16} />,
+      icon: <IconUserQuestion size={16} />,
     },
   ];
 
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+
   return (
     <HeroUINavbar
       maxWidth="full"

@@ -57,6 +57,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const locale = useLocale();
+
   return (
     <html suppressHydrationWarning lang="en">
       <head />
