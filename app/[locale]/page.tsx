@@ -15,16 +15,21 @@ import { useCryptoWidget } from './widget';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { useCryptoMarquee } from './cryptoMarquee';
+import Script from 'next/script';
+import Home from './(components)/Home';
 
-export default function Home() {
+export default function Page() {
   useCryptoWidget();
-  const theme = localStorage.getItem('theme');
+  const theme =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('theme') || 'light'
+      : 'light';
+
   useCryptoMarquee(theme === 'dark' ? 'dark' : 'light');
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row items-center md:items-start md:justify-between mx-auto">
-        {/* Text content */}
+      {/* <div className="flex flex-col md:flex-row items-center md:items-start md:justify-between mx-auto">
         <div className="text-center md:text-left md:max-w-xl">
           <span
             className={title({
@@ -73,17 +78,31 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Image */}
         <div className="mt-6 md:mt-0 md:ml-8">
           <img
-            src="https://rockiereact-tau.vercel.app/static/media/banner-01.eec598253cec8f46e54f.png"
+            src="https://rockiereact-tau.vercel.app/static/media/banner-04.543529f8ea7cfb150846.png"
             alt=""
             className="w-64 md:w-96"
           />
         </div>
-      </div>
-
+      </div> */}
+      <Home />
       <div
+        className="binance-widget-marquee pt-6"
+        data-cmc-ids="1,1027,52,5426,74,2010,20947,825,1839,1975,5805,1958"
+        data-theme="light"
+        data-transparent="false"
+        data-locale="vi"
+        data-fiat="USD"
+        data-layout="banner"
+        data-powered-by="Cung cấp bởi"
+        data-disclaimer="Miễn trừ trách nhiệm"
+      ></div>
+      <Script
+        src="https://public.bnbstatic.com/unpkg/growth-widget/cryptoCurrencyWidget@0.0.22.min.js"
+        strategy="afterInteractive"
+      />
+      {/* <div
         id="cr-widget-marquee"
         data-coins="bitcoin,ethereum,ripple,monero,litecoin,bnb,solana,tether,usdcoin,dogecoin,tron,cardano,chainlink,hyperliquid,avalanche,sui"
         data-theme={theme}
@@ -94,10 +113,10 @@ export default function Home() {
         data-api-url="https://api.cryptorank.io/v0"
       >
         <script src="https://cryptorank.io/widget/marquee.js"></script>
-      </div>
+      </div> */}
 
       <section className="flex flex-col items-center justify-center gap-4">
-        <FundingTabs />
+        <FundingTabs defaultActiveKey="1" />
       </section>
     </div>
   );

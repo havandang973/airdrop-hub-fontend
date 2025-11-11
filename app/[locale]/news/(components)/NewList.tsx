@@ -1,0 +1,138 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import NewsSearchBar from './NewsSearchBar';
+import NewsFilterTabs from './NewsFilterTabs';
+import NewsCard from './NewsCard';
+import { Spin } from 'antd';
+import { useGetPosts } from '@/lib/hooks/post';
+import { Link } from '@heroui/link';
+import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
+import {
+  Pagination,
+  PaginationItem,
+  PaginationCursor,
+} from '@heroui/pagination';
+export default function NewsList({ hash }: { hash?: string }) {
+  console.log('hash', hash);
+  const [selectedCategory, setSelectedCategory] = useState(hash || 'all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const router = useRouter();
+  const locale = useLocale();
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(9);
+
+  const [filters, setFilters] = useState({
+    title: '',
+    category: 'all',
+    visibility: undefined as number | undefined,
+    page,
+    size: pageSize,
+  });
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, page, size: pageSize }));
+  }, [page, pageSize]);
+
+  const { data: posts, isLoading, refetch } = useGetPosts(filters);
+
+  useEffect(() => {
+    if (hash) {
+      setSelectedCategory(hash);
+    }
+  }, [hash]);
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, category: selectedCategory }));
+    refetch();
+  }, [selectedCategory, hash]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[300px] dark:bg-gray-900">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!posts?.data || posts.data.length === 0) {
+    return (
+      <section className="w-full mx-auto px-4 py-10 text-center text-gray-500 dark:text-gray-400 dark:bg-gray-900">
+        <h1 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">
+          Không có bài viết nào
+        </h1>
+        <p>Hiện chưa có bài viết được đăng tải.</p>
+      </section>
+    );
+  }
+
+  const filteredNews = posts.data.filter((post: any) =>
+    post.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <section className="mx-auto px-4 py-10 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      <h1 className="text-center text-3xl font-semibold mb-6 text-gray-900 dark:text-white">
+        <span className="text-blue-600 dark:text-blue-400">Tin Tức</span>
+      </h1>
+
+      <div className="mb-4">
+        <NewsSearchBar value={searchTerm} onChange={setSearchTerm} />
+      </div>
+
+      <div className="mt-8 mb-6">
+        <NewsFilterTabs
+          value={selectedCategory}
+          onChange={(value) => {
+            setSelectedCategory(value);
+            if (value === 'all') {
+              router.push(`/${locale}/news`);
+            } else {
+              window.location.hash = value; // ✅ Cập nhật hash trên URL
+            }
+          }}
+        />
+      </div>
+
+      {/* ✅ Grid hiển thị bài viết */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {filteredNews.map((post: any) => (
+          <Link
+            key={post.id}
+            href={
+              post.category?.name
+                ? `/${locale}/news/${post.category.name}/${post.slug}`
+                : `/${locale}/news/${post.slug}`
+            }
+          >
+            <NewsCard
+              post={{
+                id: post.id,
+                title: post.title,
+                date: new Date(post.createdAt).toLocaleDateString('vi-VN'),
+                image: post.thumbnail || '/default-thumbnail.jpg',
+              }}
+            />
+          </Link>
+        ))}
+      </div>
+
+      {/* ✅ Pagination */}
+      <div className="flex justify-center mt-10">
+        <Pagination
+          total={Math.ceil((posts.pagination?.total || 0) / pageSize)}
+          page={page}
+          onChange={(newPage) => setPage(newPage)}
+          showControls
+          color="primary"
+          classNames={{
+            item: 'dark:bg-gray-800 dark:text-gray-200',
+            cursor: 'dark:bg-blue-500 dark:text-white',
+          }}
+        />
+      </div>
+    </section>
+  );
+}

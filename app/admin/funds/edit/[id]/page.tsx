@@ -1,0 +1,153 @@
+'use client';
+import { IconPlus } from '@tabler/icons-react';
+import { Button, Form, Input, Upload, message } from 'antd';
+import TextArea from 'antd/es/input/TextArea';
+import { useRouter, useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useGetFund, useGetFunds } from '@/lib/hooks/fund';
+import { mutationUpdateFund } from '@/lib/hooks/fund';
+import slugify from 'slugify';
+
+export default function EditFundPage() {
+  const CLOUD_NAME = 'dzdbaikqm';
+  const UPLOAD_PRESET = 'upload_img';
+  const [form] = Form.useForm();
+  const router = useRouter();
+  const { id } = useParams(); // Lấy id từ URL
+  const { data: fund, isLoading } = useGetFund(String(id), !!id);
+  const { mutate: updateFund } = mutationUpdateFund();
+  const [selectFund, setSelectFund] = useState<any>(fund);
+  useEffect(() => {
+    setSelectFund(fund);
+  }, [fund]);
+
+  useEffect(() => {
+    if (selectFund) {
+      form.setFieldsValue({
+        name: selectFund.name,
+        description: selectFund.description,
+        logo: selectFund.logo
+          ? [
+              {
+                uid: '-1',
+                name: 'logo.png',
+                status: 'done',
+                url: selectFund.logo,
+              },
+            ]
+          : [],
+      });
+    }
+  }, [selectFund, form]);
+
+  const handleSubmit = (values: any) => {
+    const slug = slugify(values.name, { lower: true });
+    const logoUrl =
+      values.logo?.[0]?.response?.secure_url || values.logo?.[0]?.url || '';
+
+    const payload = {
+      name: values.name.trim(),
+      slug,
+      logo: logoUrl,
+      description: values.description || '',
+    };
+
+    updateFund(
+      { id: Number(id), obj: payload },
+      {
+        onSuccess: () => {
+          message.success('✅ Fund updated successfully!');
+          router.push('/admin/funds');
+        },
+        onError: (err: any) => {
+          console.error(err);
+          message.error('❌ Failed to update fund!');
+        },
+      }
+    );
+  };
+
+  const handleUploadChange = (info: any) => {
+    if (info.file.status === 'done') {
+      message.success('✅ Upload ảnh thành công!');
+    } else if (info.file.status === 'error') {
+      message.error('❌ Upload ảnh thất bại!');
+    }
+  };
+
+  if (isLoading) return <p>Đang tải dữ liệu...</p>;
+
+  return (
+    <div>
+      <h1 className="text-2xl font-semibold text-gray-900">Edit Fund</h1>
+
+      <div className="mt-4 p-6 bg-white rounded-lg shadow-md">
+        <Form
+          form={form}
+          layout="horizontal"
+          labelCol={{ flex: '110px' }}
+          labelAlign="left"
+          wrapperCol={{ flex: 1 }}
+          colon={false}
+          onFinish={handleSubmit}
+        >
+          {/* 🟢 NAME */}
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[{ required: true, message: 'Please enter a fund name!' }]}
+          >
+            <Input placeholder="Enter fund name" />
+          </Form.Item>
+
+          {/* 🟢 LOGO */}
+          <Form.Item
+            label="Logo"
+            name="logo"
+            valuePropName="fileList"
+            getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
+          >
+            <Upload
+              name="file"
+              listType="picture-card"
+              maxCount={1}
+              action={`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`}
+              data={{ upload_preset: UPLOAD_PRESET }}
+              onChange={handleUploadChange}
+              defaultFileList={
+                selectFund?.logo
+                  ? [
+                      {
+                        uid: '-1',
+                        name: 'logo.png',
+                        status: 'done',
+                        url: selectFund.logo,
+                      },
+                    ]
+                  : []
+              }
+            >
+              <IconPlus size={20} stroke={1} />
+            </Upload>
+          </Form.Item>
+
+          {/* 🟢 DESCRIPTION */}
+          <Form.Item
+            label="Description"
+            name="description"
+            // rules={[{ required: true, message: 'Please enter description!' }]}
+          >
+            <TextArea rows={4} placeholder="Enter description" />
+          </Form.Item>
+
+          {/* 🟢 SUBMIT BUTTON */}
+          <Form.Item label=" ">
+            <Button type="primary" htmlType="submit">
+              Save Changes
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </div>
+  );
+}

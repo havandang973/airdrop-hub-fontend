@@ -17,28 +17,30 @@ import NextLink from 'next/link';
 import clsx from 'clsx';
 import { siteConfig } from '@/config/site';
 import { ThemeSwitch } from '@/components/theme-switch';
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-  Logo,
-} from '@/components/icons';
+import { SearchIcon, Logo } from '@/components/icons';
 import { useLocale } from 'next-intl';
 import { useTranslations } from 'use-intl';
 import { Select, SelectItem } from '@heroui/select';
 import { Avatar } from '@heroui/avatar';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-
 import {
-  IconDroplet,
-  IconGraph,
-  IconHome,
-  IconInfoCircle,
-  IconNews,
+  IconHome2,
+  IconTrendingUp,
+  IconGift,
+  IconArticle,
+  IconUserQuestion,
+  IconCoin,
 } from '@tabler/icons-react';
+
+import { useGetCategories } from '@/lib/hooks/category';
+
+type NavItem = {
+  label: string;
+  href: string;
+  icon?: React.ReactNode;
+  children?: NavItem[]; // thêm optional children
+};
 
 export const Navbar = () => {
   const searchInput = (
@@ -60,59 +62,72 @@ export const Navbar = () => {
   const locale = useLocale();
   const trans = useTranslations();
   const router = useRouter();
-  const navItems = [
+  const { data: categories, isLoading } = useGetCategories(true);
+
+  const categoryIcons: Record<string, JSX.Element> = {
+    Airdrop: <IconGift size={16} />,
+    Crypto: <IconCoin size={16} />,
+    Market: <IconTrendingUp size={16} className="text-green-500" />,
+  };
+  const navItems: NavItem[] = [
     {
       label: trans('Home'),
       href: '/',
-      icon: <IconHome size={16} />,
+      icon: <IconHome2 size={16} />,
     },
     {
       label: trans('Market'),
       href: '/market',
-      icon: <IconGraph size={16} />,
-      children: [
-        {
-          label: trans('Spot'),
-          href: '/market/spot',
-          icon: <IconHome size={16} />,
-        },
-        { label: trans('Futures'), href: '/market/futures' },
-      ],
+      icon: <IconTrendingUp size={16} />,
     },
     {
       label: trans('Airdrop'),
       href: '/airdrop',
-      icon: <IconDroplet size={16} />,
+      icon: <IconGift size={16} />,
     },
     {
       label: trans('News'),
       href: '/news',
-      icon: <IconNews size={16} />,
+      icon: <IconArticle size={16} />,
       children: [
-        { label: trans('News'), href: '/news/latest' },
-        { label: trans('News'), href: '/news/analysis' },
+        ...(categories?.map((cat: any) => ({
+          label: cat.name,
+          href: `/news#${cat.name}`,
+          icon: categoryIcons[cat.name] || <IconArticle size={16} />,
+        })) || []),
       ],
     },
     {
       label: trans('About'),
       href: '/about',
-      icon: <IconInfoCircle size={16} />,
+      icon: <IconUserQuestion size={16} />,
     },
   ];
 
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+
   return (
-    <HeroUINavbar maxWidth="full" position="sticky">
+    <HeroUINavbar
+      maxWidth="full"
+      position="sticky"
+      // className="dark:bg-gray-900 bg-white fixed top-0 left-0 w-full z-50"
+      onMenuOpenChange={(open) => setOpen(open)}
+      isMenuOpen={open}
+      className="shadow-sm dark:bg-gray-900"
+    >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
+          <NextLink
+            className="flex justify-start items-center gap-1"
+            href={`/${locale}`}
+          >
             <Logo />
             <p className="font-bold text-inherit">ACME</p>
           </NextLink>
         </NavbarBrand>
-        <ul className="hidden lg:flex gap-8 justify-start ml-10">
+        <ul className="hidden lg:flex gap-4 justify-start ml-10 w-[600px]">
           {navItems.map((item) => {
             const url =
               item.href === '/' ? `/${locale}` : `/${locale}${item.href}`;
@@ -123,12 +138,12 @@ export const Navbar = () => {
 
             return (
               <li key={item.href} className="relative group">
-                {item.children ? (
+                {item?.children ? (
                   <span
                     className={clsx(
                       'flex items-center cursor-pointer gap-2 px-2 py-1 transition',
                       isActive
-                        ? 'text-primary'
+                        ? '!text-primary'
                         : 'text-foreground hover:text-primary'
                     )}
                   >
@@ -141,7 +156,7 @@ export const Navbar = () => {
                     className={clsx(
                       'flex items-center gap-2 px-2 py-1 transition',
                       isActive
-                        ? 'text-primary'
+                        ? '!text-primary'
                         : 'text-foreground hover:text-primary'
                     )}
                   >
@@ -151,8 +166,8 @@ export const Navbar = () => {
                 )}
 
                 {item.children && (
-                  <ul className="absolute left-0 pt-2 hidden group-hover:block bg-white shadow-lg rounded-md p-2 min-w-[180px]">
-                    {item.children.map((child) => {
+                  <ul className="absolute left-0 pt-2 hidden group-hover:block bg-white dark:bg-gray-900 shadow-lg rounded-md p-2 min-w-[180px]">
+                    {item.children.map((child: any) => {
                       const childUrl =
                         child.href === '/'
                           ? `/${locale}`
@@ -169,7 +184,7 @@ export const Navbar = () => {
                             className={clsx(
                               'flex items-center gap-2 px-2 py-1 transition',
                               isActiveChild
-                                ? 'text-primary'
+                                ? '!text-primary'
                                 : 'text-foreground hover:text-primary'
                             )}
                           >
@@ -188,12 +203,12 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarContent
-        className=" hidden lg:flex basis-1/5 sm:basis-full"
+        className="hidden lg:flex basis-1/5 sm:basis-full"
         justify="end"
       >
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-        <NavbarItem className="hidden lg:flex flex gap-2">
-          <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
+        <NavbarItem className="hidden lg:flex gap-2">
+          {/* <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
             <TwitterIcon className="text-default-500" />
           </Link>
           <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
@@ -201,7 +216,7 @@ export const Navbar = () => {
           </Link>
           <Link isExternal aria-label="Github" href={siteConfig.links.github}>
             <GithubIcon className="text-default-500" />
-          </Link>
+          </Link> */}
 
           <Select
             // isOpen={open}
@@ -211,7 +226,7 @@ export const Navbar = () => {
             // popoverProps={{
             //   onMouseLeave: () => setOpen(false),
             // }}
-            className="w-38"
+            className="w-38 pointer-events-none"
             classNames={{
               trigger:
                 'bg-transparent border-none shadow-none hover:bg-transparent data-[hover=true]:bg-transparent',
@@ -262,7 +277,7 @@ export const Navbar = () => {
         </NavbarItem>
       </NavbarContent>
 
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
+      <NavbarContent className="sm:hidden basis-1 pl-4 " justify="end">
         <Select
           // isOpen={open}
           // onOpenChange={setOpen}
@@ -271,6 +286,7 @@ export const Navbar = () => {
           popoverProps={{
             onMouseLeave: () => setOpen(false),
           }}
+          className="pointer-events-none"
           classNames={{
             trigger:
               'bg-transparent border-none shadow-none hover:bg-transparent data-[hover=true]:bg-transparent',
@@ -323,9 +339,9 @@ export const Navbar = () => {
         <NavbarMenuToggle />
       </NavbarContent>
 
-      <NavbarMenu>
+      <NavbarMenu className="bg-white">
         {searchInput}
-        <ul className="mt-2 flex flex-col gap-2">
+        <ul className="mt-2 flex flex-col gap-2 ">
           {navItems.map((item) => {
             const url =
               item.href === '/' ? `/${locale}` : `/${locale}${item.href}`;
@@ -335,7 +351,6 @@ export const Navbar = () => {
                 : pathname === url || pathname.startsWith(url + '/');
 
             const isOpen = openMenu === item.href;
-
             return (
               <li key={item.href} className="relative">
                 <button
@@ -343,7 +358,7 @@ export const Navbar = () => {
                   className={clsx(
                     'flex w-full items-center justify-between px-2 py-1 transition',
                     isActive
-                      ? 'text-primary'
+                      ? '!text-primary'
                       : 'text-foreground hover:text-primary'
                   )}
                 >
@@ -353,7 +368,7 @@ export const Navbar = () => {
                         className={clsx(
                           'flex items-center cursor-pointer gap-2 px-2 py-1 transition',
                           isActive
-                            ? 'text-primary'
+                            ? '!text-primary'
                             : 'text-foreground hover:text-primary'
                         )}
                       >
@@ -373,6 +388,7 @@ export const Navbar = () => {
                           ? 'text-primary'
                           : 'text-foreground hover:text-primary'
                       )}
+                      onClick={() => setOpen(false)}
                     >
                       {item.icon}
                       {item.label}
@@ -398,9 +414,10 @@ export const Navbar = () => {
                             className={clsx(
                               'flex items-center gap-2 px-2 py-1 transition',
                               isActiveChild
-                                ? 'text-primary'
+                                ? '!text-primary'
                                 : 'text-foreground hover:text-primary'
                             )}
+                            onClick={() => setOpen(false)}
                           >
                             {child.icon}
                             {child.label}
