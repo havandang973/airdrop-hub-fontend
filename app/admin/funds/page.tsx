@@ -17,12 +17,15 @@ import {
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useDeleteFund, useGetFunds } from '@/lib/hooks/fund';
+import { SearchIcon } from '@/components/icons';
+import { Input } from '@heroui/input';
 
 export default function FundsPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState({
     name: '',
+    fund: '',
     status: undefined as string | undefined,
     startDate: undefined as string | undefined,
     endDate: undefined as string | undefined,
@@ -121,11 +124,57 @@ export default function FundsPage() {
     },
   ];
 
+  const handleReset = () => {
+    setFilters({
+      name: '',
+      fund: '',
+      status: undefined as string | undefined,
+      startDate: undefined as string | undefined,
+      endDate: undefined as string | undefined,
+      minRaise: undefined as number | undefined,
+      maxRaise: undefined as number | undefined,
+      page,
+      size: pageSize,
+    });
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-900 mb-4">Funds</h1>
 
       <div className="p-6 bg-white rounded-lg shadow-md">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl p-4 mb-5 bg-white dark:bg-[#1f1f1f] shadow-sm">
+          {/* LEFT - Filters */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Search */}
+            <Input
+              type="text"
+              placeholder="Nhập tên quỹ..."
+              startContent={<SearchIcon className="text-gray-500" size={18} />}
+              value={filters.fund}
+              onChange={(e) =>
+                setFilters((p) => ({ ...p, fund: e.target.value }))
+              }
+              className="w-[200px]"
+              variant="bordered"
+              classNames={{ inputWrapper: 'rounded-md border-1' }}
+            />
+          </div>
+
+          {/* RIGHT - Buttons */}
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="solid"
+              color="primary"
+              className="rounded-md border-1"
+              onPress={handleReset}
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
+
         <Table
           columns={columns}
           dataSource={funds?.data || []}

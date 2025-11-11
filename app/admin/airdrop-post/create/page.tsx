@@ -1,14 +1,6 @@
 'use client';
-import { IconPlus } from '@tabler/icons-react';
 import { Button, Form, Input, Select, Switch, Upload, message } from 'antd';
-import {
-  mutationCreateAirdrop,
-  mutationCreateAirdropPost,
-  useGetAirdrops,
-} from '@/lib/hooks/airdrop';
-import slugify from 'slugify'; // npm install slugify
-import { SelectItem } from '@heroui/select';
-import { Avatar } from '@heroui/avatar';
+import { mutationCreateAirdropPost, useGetAirdrops } from '@/lib/hooks/airdrop';
 import TinyEditor from '../../airdrop/(components)/TinyEditor';
 
 export default function Page() {

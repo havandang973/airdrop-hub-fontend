@@ -15,7 +15,10 @@ export default function EditAirdropPage() {
   const router = useRouter();
   const params = useParams();
   const { mutate: updateAirdrop } = mutationUpdateAirdrop();
-  const { data: funds } = useGetFunds(); // 🔹 lấy tất cả fund
+  const { data: funds } = useGetFunds({
+    page: 1,
+    size: 100,
+  }); // 🔹 lấy tất cả fund
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
   const { data: airdrop, isLoading } = useGetAirdrop(slug as string, !!slug);
   const [selectAirdrop, setSelectAirdrop] = useState<any>(null);
@@ -163,7 +166,7 @@ export default function EditAirdropPage() {
                 option.label.toLowerCase().includes(input.toLowerCase())
               }
             >
-              {funds?.map((f: any) => (
+              {funds?.data.map((f: any) => (
                 <Select.Option
                   key={f.id}
                   value={f.id}

@@ -175,13 +175,13 @@ export default function EditNewsPage() {
           </Form.Item>
 
           {/* 🟢 VISIBILITY */}
-          <Form.Item
+          {/* <Form.Item
             label="Visibility"
             name="visibility"
             valuePropName="checked"
           >
             <Switch />
-          </Form.Item>
+          </Form.Item> */}
 
           {/* 🟢 PIN */}
           <Form.Item label="Pin" name="pin" valuePropName="checked">

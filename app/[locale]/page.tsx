@@ -88,7 +88,7 @@ export default function Page() {
       </div> */}
       <Home />
       <div
-        className="binance-widget-marquee"
+        className="binance-widget-marquee pt-6"
         data-cmc-ids="1,1027,52,5426,74,2010,20947,825,1839,1975,5805,1958"
         data-theme="light"
         data-transparent="false"

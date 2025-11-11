@@ -17,28 +17,23 @@ import NextLink from 'next/link';
 import clsx from 'clsx';
 import { siteConfig } from '@/config/site';
 import { ThemeSwitch } from '@/components/theme-switch';
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-  Logo,
-} from '@/components/icons';
+import { SearchIcon, Logo } from '@/components/icons';
 import { useLocale } from 'next-intl';
 import { useTranslations } from 'use-intl';
 import { Select, SelectItem } from '@heroui/select';
 import { Avatar } from '@heroui/avatar';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-
 import {
-  IconDroplet,
-  IconGraph,
-  IconHome,
-  IconInfoCircle,
-  IconNews,
+  IconHome2,
+  IconTrendingUp,
+  IconGift,
+  IconArticle,
+  IconUserQuestion,
+  IconCoin,
 } from '@tabler/icons-react';
+
+import { useGetCategories } from '@/lib/hooks/category';
 
 type NavItem = {
   label: string;
@@ -67,49 +62,52 @@ export const Navbar = () => {
   const locale = useLocale();
   const trans = useTranslations();
   const router = useRouter();
+  const { data: categories, isLoading } = useGetCategories(true);
+
+  const categoryIcons: Record<string, JSX.Element> = {
+    Airdrop: <IconGift size={16} />,
+    Crypto: <IconCoin size={16} />,
+    Market: <IconTrendingUp size={16} className="text-green-500" />,
+  };
   const navItems: NavItem[] = [
     {
       label: trans('Home'),
       href: '/',
-      icon: <IconHome size={16} />,
+      icon: <IconHome2 size={16} />,
     },
     {
       label: trans('Market'),
       href: '/market',
-      icon: <IconGraph size={16} />,
-      children: [
-        {
-          label: trans('Spot'),
-          href: '/market/spot',
-          icon: <IconGraph size={16} />,
-        },
-        {
-          label: trans('Futures'),
-          href: '/market/futures',
-          icon: <IconGraph size={16} />,
-        },
-      ],
+      icon: <IconTrendingUp size={16} />,
     },
     {
       label: trans('Airdrop'),
       href: '/airdrop',
-      icon: <IconDroplet size={16} />,
+      icon: <IconGift size={16} />,
     },
     {
       label: trans('News'),
       href: '/news',
-      icon: <IconNews size={16} />,
+      icon: <IconArticle size={16} />,
+      children: [
+        ...(categories?.map((cat: any) => ({
+          label: cat.name,
+          href: `/news#${cat.name}`,
+          icon: categoryIcons[cat.name] || <IconArticle size={16} />,
+        })) || []),
+      ],
     },
     {
       label: trans('About'),
       href: '/about',
-      icon: <IconInfoCircle size={16} />,
+      icon: <IconUserQuestion size={16} />,
     },
   ];
 
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+
   return (
     <HeroUINavbar
       maxWidth="full"
@@ -117,16 +115,19 @@ export const Navbar = () => {
       // className="dark:bg-gray-900 bg-white fixed top-0 left-0 w-full z-50"
       onMenuOpenChange={(open) => setOpen(open)}
       isMenuOpen={open}
-      className="shadow-sm  dark:bg-gray-900"
+      className="shadow-sm dark:bg-gray-900"
     >
-      <NavbarContent className="basis-1/5 sm:basis-full " justify="start">
+      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
+          <NextLink
+            className="flex justify-start items-center gap-1"
+            href={`/${locale}`}
+          >
             <Logo />
             <p className="font-bold text-inherit">ACME</p>
           </NextLink>
         </NavbarBrand>
-        <ul className="hidden lg:flex gap-8 justify-start ml-10">
+        <ul className="hidden lg:flex gap-4 justify-start ml-10 w-[600px]">
           {navItems.map((item) => {
             const url =
               item.href === '/' ? `/${locale}` : `/${locale}${item.href}`;
@@ -165,7 +166,7 @@ export const Navbar = () => {
                 )}
 
                 {item.children && (
-                  <ul className="absolute left-0 pt-2 hidden group-hover:block  shadow-lg rounded-md p-2 min-w-[180px]">
+                  <ul className="absolute left-0 pt-2 hidden group-hover:block bg-white dark:bg-gray-900 shadow-lg rounded-md p-2 min-w-[180px]">
                     {item.children.map((child: any) => {
                       const childUrl =
                         child.href === '/'
@@ -202,12 +203,12 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarContent
-        className="hidden lg:flex basis-1/5 sm:basis-full "
+        className="hidden lg:flex basis-1/5 sm:basis-full"
         justify="end"
       >
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden lg:flex gap-2">
-          <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
+          {/* <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
             <TwitterIcon className="text-default-500" />
           </Link>
           <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
@@ -215,7 +216,7 @@ export const Navbar = () => {
           </Link>
           <Link isExternal aria-label="Github" href={siteConfig.links.github}>
             <GithubIcon className="text-default-500" />
-          </Link>
+          </Link> */}
 
           <Select
             // isOpen={open}
@@ -225,7 +226,7 @@ export const Navbar = () => {
             // popoverProps={{
             //   onMouseLeave: () => setOpen(false),
             // }}
-            className="w-38"
+            className="w-38 pointer-events-none"
             classNames={{
               trigger:
                 'bg-transparent border-none shadow-none hover:bg-transparent data-[hover=true]:bg-transparent',
@@ -285,6 +286,7 @@ export const Navbar = () => {
           popoverProps={{
             onMouseLeave: () => setOpen(false),
           }}
+          className="pointer-events-none"
           classNames={{
             trigger:
               'bg-transparent border-none shadow-none hover:bg-transparent data-[hover=true]:bg-transparent',

@@ -1,78 +1,99 @@
 'use client';
 
 import { useGetPosts } from '@/lib/hooks/post';
-import { Link } from '@heroui/link';
-import { Card, Skeleton, Tag } from 'antd';
-import Image from 'next/image';
 import { useLocale } from 'next-intl';
+import { Link } from '@heroui/link';
+import { Image } from '@heroui/image';
 
-export default function NewsTable() {
+export default function LatestNews() {
   const { data: posts, isLoading } = useGetPosts({
     title: '',
     category: 'all',
     visibility: 1,
     page: 1,
-    size: 10,
+    size: 10, // lấy 5 bài, nhưng chỉ hiển thị 2 bài đầu tiên
   });
+
+  const locale = useLocale();
+  const news = (posts?.data || []).slice(0, 10);
+
+  function stripHTML(html: string, limit = 100) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const text = tempDiv.textContent || tempDiv.innerText || '';
+    return text.length > limit ? text.slice(0, limit) + '...' : text;
+  }
 
   if (isLoading) {
     return (
-      <Card className="p-6 dark:!bg-black">
-        <Skeleton active paragraph={{ rows: 6 }} />
-      </Card>
+      <section className="py-12 px-6 max-w-6xl mx-auto">
+        <h2 className="text-2xl font-bold mb-8 text-center">
+          Tin tức mới nhất
+        </h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          {[...Array(2)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-2xl shadow p-4 flex gap-4 animate-pulse"
+            >
+              <div className="w-32 h-32 bg-gray-200 rounded-xl"></div>
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 w-1/3"></div>
+                <div className="h-5 bg-gray-200 w-3/4"></div>
+                <div className="h-4 bg-gray-200 w-full"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     );
   }
 
-  const latestNews = (posts?.data || []).slice(0, 10);
-  const locale = useLocale();
   return (
-    // <Card className="p-6 dark:!bg-black">
-    <div className="flex flex-col gap-4">
-      {latestNews.map((item: any) => (
-        <Card key={item.id} className="w-full">
+    <section className="">
+      {/* <h2 className="text-2xl font-bold mb-8 text-center">Tin tức mới nhất</h2> */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {news.map((item: any) => (
           <Link
+            key={item.id}
             href={`/${locale}/news/${item.slug}`}
-            className="flex items-center gap-4 rounded-lg transition-all duration-200 cursor-pointer"
+            className="bg-white rounded-2xl shadow hover:shadow-lg transition p-4 flex gap-4 group"
           >
-            {/* Thumbnail */}
-            <div className="w-20 h-20 relative flex-shrink-0 rounded-md overflow-hidden">
-              <Image
-                src={item.thumbnail || '/default-thumb.jpg'}
-                alt={item.title}
-                fill
-                className="object-cover"
-              />
-            </div>
+            <Image
+              src={item.thumbnail || '/default-thumb.jpg'}
+              alt={item.title}
+              width={128}
+              height={128}
+              className="w-32 h-32 object-cover rounded-xl group-hover:scale-105 transition-transform"
+            />
 
-            {/* Nội dung tin */}
             <div className="flex-1">
-              <p className="font-medium text-gray-900 dark:text-white line-clamp-2 transition-colors">
-                {item.title}
+              <p className="text-sm text-gray-400">
+                {item.createdAt
+                  ? new Date(item.createdAt).toLocaleDateString('vi-VN', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                    })
+                  : ''}
               </p>
-
-              <div className="flex justify-between items-center mt-2 text-xs">
-                <Tag color="blue" className="m-0 text-xs px-2 py-0.5 rounded">
-                  {item.category?.name || 'Uncategorized'}
-                </Tag>
-                <span className="text-gray-500 dark:text-gray-400">
-                  {item.createdAt
-                    ? new Date(item.createdAt).toLocaleDateString('vi-VN', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                      })
-                    : ''}
-                </span>
-              </div>
+              <h3 className="font-semibold text-lg mb-2 text-gray-800 group-hover:text-primary transition">
+                {item.title}
+              </h3>
+              <p className="text-gray-600 text-sm">
+                {stripHTML(item.content).trim() ||
+                  'Không có mô tả cho bài viết này.'}
+              </p>
             </div>
           </Link>
-        </Card>
-      ))}
+        ))}
 
-      {latestNews.length === 0 && (
-        <p className="text-center text-gray-400">Không có tin nào.</p>
-      )}
-    </div>
-    // </Card>
+        {news.length === 0 && (
+          <p className="text-center text-gray-500 col-span-2">
+            Không có tin tức mới.
+          </p>
+        )}
+      </div>
+    </section>
   );
 }

@@ -4,15 +4,9 @@ import {
   Avatar,
   Card,
   ConfigProvider,
-  Spin,
   Table as AntdTable,
   theme,
   Tag,
-  Space,
-  Input,
-  Select,
-  DatePicker,
-  Button,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -24,6 +18,11 @@ import { ColumnsType } from 'antd/es/table';
 import { toNumber } from 'lodash';
 import { Time } from '@/lib/helpers/Time';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { SelectItem, Select } from '@heroui/select';
+import { SearchIcon } from '@/components/icons';
+import { Input } from '@heroui/input';
+import { DateRangePicker } from '@heroui/date-picker';
+import { Button } from '@heroui/button';
 
 export default function Page() {
   console.log('renderr');
@@ -47,11 +46,11 @@ export default function Page() {
   useEffect(() => {
     setFilters((prev) => ({ ...prev, page, size: pageSize }));
   }, [page, pageSize]);
-  const { data: fund, isLoading } = useGetFund(slug as string, !!slug, filters);
 
-  const [zoomSrc, setZoomSrc] = useState<string | null>(null);
+  const { data: fund } = useGetFund(slug as string, !!slug, filters);
   const locale = useLocale();
   const [data, setData] = useState<any>(fund);
+
   useEffect(() => {
     setData(fund || null);
   }, [fund]);
@@ -79,6 +78,7 @@ export default function Page() {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
+      fixed: 'left',
       sorter: (a, b) => a.name.localeCompare(b.name),
       sortOrder: sortedInfo.columnKey === 'name' ? sortedInfo.order : null,
       ellipsis: true,
@@ -152,7 +152,7 @@ export default function Page() {
   //     </div>
   //   );
   // }
-
+  console.log('data?.pagination?.total', data?.pagination?.total);
   return (
     <div className="space-y-10">
       {/* Header */}
@@ -196,124 +196,107 @@ export default function Page() {
         </span>
       </div>
 
-      {/* Main content */}
-      <div className="flex flex-col gap-4 md:hidden">
-        {fund?.airdrops?.map((item: any) => (
-          <Card key={item.id} className="p-4 rounded-md shadow-sm">
-            <Link
-              href={`/${locale}/airdrop/${item.slug}`}
-              className="flex items-center gap-2"
-            >
-              {item.logo && (
-                <img
-                  src={item.logo}
-                  alt={item.name}
-                  style={{ width: 24, height: 24, borderRadius: '50%' }}
-                />
-              )}
-              <span className="font-semibold text-black dark:text-white hover:text-blue-500 transition-colors">
-                {item.name}
-              </span>
-            </Link>
-            {item.raise && (
-              <div className="flex justify-between text-sm mt-2">
-                <span>Raise</span>
-                <span className="font-semibold">{item.raise}</span>
-              </div>
-            )}
-            {item.status && (
-              <div className="flex justify-between text-sm">
-                <span>Status</span>
-                <span className="font-semibold">{item.status}</span>
-              </div>
-            )}
-            {/* {item.moniScore && (
-              <div className="flex justify-between text-sm">
-                <GradientSlider score={item.moniScore} />
-                <span className="font-semibold">{item.moniScore}</span>
-              </div>
-            )} */}
-          </Card>
-        ))}
-      </div>
-
-      <div className="hidden md:block">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl p-3 mb-5 bg-white dark:bg-[#1f1f1f] shadow-sm">
-          <Space wrap size="middle">
+      <div className="">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl p-4 mb-5 bg-white dark:bg-[#1f1f1f] shadow-sm">
+          {/* LEFT - Filters */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Search */}
             <Input
-              placeholder="Search name..."
-              prefix={<SearchOutlined />}
+              type="text"
+              placeholder="Nhập tên..."
+              startContent={<SearchIcon className="text-gray-500" size={18} />}
               value={filters.name}
               onChange={(e) =>
                 setFilters((p) => ({ ...p, name: e.target.value }))
               }
-              style={{ width: 200 }}
+              className="w-[200px]"
+              variant="bordered"
+              classNames={{ inputWrapper: 'rounded-md border-1' }}
             />
-            <Select
-              placeholder="Status"
-              allowClear
-              value={filters.status}
-              onChange={(v) => setFilters((p) => ({ ...p, status: v }))}
-              style={{ width: 140 }}
-              options={[
-                { value: 'active', label: 'Active' },
-                { value: 'inactive', label: 'Inactive' },
-              ]}
-            />
+
+            {/* Range input */}
             <div className="flex items-center">
               <Input
                 type="number"
-                placeholder="Start raise"
-                min={0}
-                value={String(filters.minRaise)}
+                placeholder="Vốn từ"
+                value={filters.minRaise?.toString() || ''}
                 onChange={(e) =>
                   setFilters((p) => ({
                     ...p,
                     minRaise: Number(e.target.value),
                   }))
                 }
-                className="!rounded-none !rounded-l-md"
+                className="w-[140px]"
+                variant="bordered"
+                classNames={{
+                  inputWrapper: 'rounded-md rounded-r-none border-1',
+                }}
               />
               <Input
                 type="number"
-                placeholder="End raise"
-                min={0}
-                value={String(filters.maxRaise)}
+                placeholder="Vốn đến"
+                value={filters.maxRaise?.toString() || ''}
                 onChange={(e) =>
                   setFilters((p) => ({
                     ...p,
                     maxRaise: Number(e.target.value),
                   }))
                 }
-                className="!rounded-none !rounded-r-md"
+                className="w-[140px]"
+                variant="bordered"
+                classNames={{
+                  inputWrapper: 'rounded-md rounded-l-none border-1 ',
+                }}
               />
             </div>
 
-            <DatePicker.RangePicker
-              onChange={(dates) =>
+            {/* Status */}
+            <Select
+              labelPlacement="outside"
+              placeholder="Trạng thái"
+              selectedKeys={filters.status ? [filters.status] : []}
+              onChange={(e) =>
+                setFilters((p) => ({ ...p, status: e.target.value }))
+              }
+              className="w-[140px]"
+              variant="bordered"
+              classNames={{ trigger: 'rounded-md border-1' }}
+            >
+              <SelectItem key="active">Active</SelectItem>
+              <SelectItem key="inactive">Inactive</SelectItem>
+            </Select>
+
+            {/* Date Range */}
+            <DateRangePicker
+              // label="Thời gian"
+              variant="bordered"
+              labelPlacement="outside-left"
+              className="w-[300px]"
+              onChange={(range) =>
                 setFilters((p) => ({
                   ...p,
-                  startDate: dates?.[0]?.format('YYYY-MM-DD'),
-                  endDate: dates?.[1]?.format('YYYY-MM-DD'),
+                  startDate: range?.start?.toString() || '',
+                  endDate: range?.end?.toString() || '',
                 }))
               }
+              classNames={{ inputWrapper: 'rounded-md border-1' }}
             />
-          </Space>
+          </div>
 
-          <Space>
-            {/* <Button
-                    icon={<FilterOutlined />}
-                    type="primary"
-                    className="bg-blue-500 hover:bg-blue-600"
-                    onClick={handleFilter}
-                  >
-                    Filter
-                  </Button> */}
-            <Button icon={<ReloadOutlined />} onClick={handleReset}>
+          {/* RIGHT - Buttons */}
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="solid"
+              color="primary"
+              className="rounded-md border-1"
+              onPress={handleReset}
+            >
               Reset
             </Button>
-          </Space>
+          </div>
         </div>
+
         <ConfigProvider
           theme={{
             algorithm:
@@ -332,7 +315,16 @@ export default function Page() {
             dataSource={fund?.airdrops || []}
             rowKey="id"
             onChange={handleChange}
-            pagination={{ pageSize: 10 }}
+            pagination={{
+              current: page,
+              pageSize,
+              total: data?.pagination?.total || 0,
+              onChange: (page, pageSize) => {
+                setPage(page);
+                setPageSize(pageSize);
+              },
+            }}
+            scroll={{ x: 800 }}
           />
         </ConfigProvider>
       </div>

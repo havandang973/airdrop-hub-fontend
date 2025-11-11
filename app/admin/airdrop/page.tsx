@@ -1,7 +1,5 @@
 'use client';
 import { Flex, Table, Tag } from 'antd';
-import { useQuery } from '@tanstack/react-query';
-import { getAirdrops } from '@/lib/api/airdrop/getAirdrops';
 import { useDeleteAirdrop, useGetAirdrops } from '@/lib/hooks/airdrop';
 import {
   IconExclamationCircleFilled,
@@ -16,17 +14,34 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/modal';
-import { Button } from '@heroui/button';
 import { Link } from '@heroui/link';
-import { use, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Input } from '@heroui/input';
+import { SearchIcon } from '@/components/icons';
+import { Select, SelectItem } from '@heroui/select';
+import { DateRangePicker } from '@heroui/date-picker';
+import { Button } from '@heroui/button';
 
 export default function Page() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const { data: airdrops, isLoading } = useGetAirdrops({
+  const [filters, setFilters] = useState({
+    name: '',
+    status: undefined as string | undefined,
+    fund: '',
+    startDate: undefined as string | undefined,
+    endDate: undefined as string | undefined,
+    minRaise: undefined as number | undefined,
+    maxRaise: undefined as number | undefined,
     page,
     size: pageSize,
   });
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, page, size: pageSize }));
+  }, [page, pageSize]);
+
+  const { data: airdrops, isLoading } = useGetAirdrops(filters);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { mutate: deleteAirdrop, isPending } = useDeleteAirdrop();
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -45,12 +60,12 @@ export default function Page() {
   };
 
   const columns = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      width: 80,
-    },
+    // {
+    //   title: 'ID',
+    //   dataIndex: 'id',
+    //   key: 'id',
+    //   width: 80,
+    // },
     {
       title: 'Name',
       dataIndex: 'name',
@@ -161,25 +176,144 @@ export default function Page() {
     },
   ];
 
+  const handleReset = () => {
+    setFilters({
+      name: '',
+      status: undefined,
+      fund: '',
+      startDate: undefined,
+      endDate: undefined,
+      minRaise: undefined,
+      maxRaise: undefined,
+      page: 1,
+      size: 10,
+    });
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-900 mb-4">
         Airdrop List
       </h1>
       <div className="p-6 bg-white rounded-lg shadow-md">
-        {/* <Table
-          columns={columns}
-          dataSource={airdrops?.data || []}
-          loading={isLoading}
-          rowKey="id"
-          pagination={{ pageSize: 10 }}
-        /> */}
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl p-4 mb-5 bg-white dark:bg-[#1f1f1f] shadow-sm">
+          {/* LEFT - Filters */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Search */}
+            <Input
+              type="text"
+              placeholder="Nhập tên..."
+              startContent={<SearchIcon className="text-gray-500" size={18} />}
+              value={filters.name}
+              onChange={(e) =>
+                setFilters((p) => ({ ...p, name: e.target.value }))
+              }
+              className="w-[200px]"
+              variant="bordered"
+              classNames={{ inputWrapper: 'rounded-md border-1' }}
+            />
+
+            {/* Range input */}
+            <div className="flex items-center">
+              <Input
+                type="number"
+                placeholder="Vốn từ"
+                value={filters.minRaise?.toString() || ''}
+                onChange={(e) =>
+                  setFilters((p) => ({
+                    ...p,
+                    minRaise: Number(e.target.value),
+                  }))
+                }
+                className="w-[140px]"
+                variant="bordered"
+                classNames={{
+                  inputWrapper: 'rounded-md rounded-r-none border-1',
+                }}
+              />
+              <Input
+                type="number"
+                placeholder="Vốn đến"
+                value={filters.maxRaise?.toString() || ''}
+                onChange={(e) =>
+                  setFilters((p) => ({
+                    ...p,
+                    maxRaise: Number(e.target.value),
+                  }))
+                }
+                className="w-[140px]"
+                variant="bordered"
+                classNames={{
+                  inputWrapper: 'rounded-md rounded-l-none border-1 ',
+                }}
+              />
+            </div>
+
+            {/* Status */}
+            <Select
+              labelPlacement="outside"
+              placeholder="Trạng thái"
+              selectedKeys={filters.status ? [filters.status] : []}
+              onChange={(e) =>
+                setFilters((p) => ({ ...p, status: e.target.value }))
+              }
+              className="w-[140px]"
+              variant="bordered"
+              classNames={{ trigger: 'rounded-md border-1' }}
+            >
+              <SelectItem key="active">Active</SelectItem>
+              <SelectItem key="inactive">Inactive</SelectItem>
+            </Select>
+
+            {/* Fund */}
+            <Input
+              placeholder="Nhập quỹ..."
+              value={filters.fund}
+              onChange={(e) =>
+                setFilters((p) => ({ ...p, fund: e.target.value }))
+              }
+              className="w-[160px]"
+              variant="bordered"
+              classNames={{ inputWrapper: 'rounded-md border-1' }}
+            />
+
+            {/* Date Range */}
+            <DateRangePicker
+              // label="Thời gian"
+              variant="bordered"
+              labelPlacement="outside-left"
+              className="w-[300px]"
+              onChange={(range) =>
+                setFilters((p) => ({
+                  ...p,
+                  startDate: range?.start?.toString() || '',
+                  endDate: range?.end?.toString() || '',
+                }))
+              }
+              classNames={{ inputWrapper: 'rounded-md border-1' }}
+            />
+          </div>
+
+          {/* RIGHT - Buttons */}
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="solid"
+              color="primary"
+              className="rounded-md border-1"
+              onPress={handleReset}
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
 
         <Table
           columns={columns}
           dataSource={airdrops?.data || []}
           loading={isLoading}
           rowKey="id"
+          scroll={{ x: 'max-content', y: 'calc(100vh - 380px)' }}
           pagination={{
             current: page,
             pageSize,

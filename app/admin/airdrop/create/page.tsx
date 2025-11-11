@@ -18,7 +18,10 @@ export default function Page() {
   const UPLOAD_PRESET = 'upload_img';
 
   // 🔹 Lấy danh sách Fund
-  const { data: funds } = useGetFunds(); // trả về mảng {id, name}
+  const { data: funds } = useGetFunds({
+    page: 1,
+    size: 10,
+  });
 
   const handleUploadChange = (info: any) => {
     if (info.file.status === 'done') message.success('Upload ảnh thành công!');
@@ -144,7 +147,7 @@ export default function Page() {
                 option.label.toLowerCase().includes(input.toLowerCase())
               }
             >
-              {funds?.map((f: any) => (
+              {funds?.data.map((f: any) => (
                 <Select.Option
                   key={f.id}
                   value={f.id}

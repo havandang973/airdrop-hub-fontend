@@ -19,6 +19,10 @@ import {
   IconHome,
 } from '@tabler/icons-react';
 import { useDeletePost, useGetPosts } from '@/lib/hooks/post';
+import { Input } from '@heroui/input';
+import { SearchIcon } from '@/components/icons';
+import { Select, SelectItem } from '@heroui/select';
+import { useGetCategories } from '@/lib/hooks/category';
 
 export default function NewsPage() {
   const [page, setPage] = useState(1);
@@ -37,6 +41,7 @@ export default function NewsPage() {
 
   const { data: posts, isLoading } = useGetPosts(filters);
   const { mutate: deletePost, isPending } = useDeletePost();
+  const { data: categories } = useGetCategories();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -158,11 +163,70 @@ export default function NewsPage() {
     },
   ];
 
+  const handleReset = () => {
+    setFilters({
+      title: '',
+      category: 'all',
+      visibility: undefined,
+      page: 1,
+      size: 10,
+    });
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-900 mb-4">News Posts</h1>
 
       <div className="p-6 bg-white rounded-lg shadow-md">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl p-4 mb-5 bg-white dark:bg-[#1f1f1f] shadow-sm">
+          {/* LEFT - Filters */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Search */}
+            <Input
+              type="text"
+              placeholder="Nhập tiêu đề..."
+              startContent={<SearchIcon className="text-gray-500" size={18} />}
+              value={filters.title}
+              onChange={(e) =>
+                setFilters((p) => ({ ...p, title: e.target.value }))
+              }
+              className="w-[200px]"
+              variant="bordered"
+              classNames={{ inputWrapper: 'rounded-md border-1' }}
+            />
+
+            {/* Status */}
+            <Select
+              labelPlacement="outside"
+              placeholder="Danh mục"
+              selectedKeys={filters.category ? [filters.category] : []}
+              onChange={(e) =>
+                setFilters((p) => ({ ...p, category: e.target.value }))
+              }
+              className="w-[140px]"
+              variant="bordered"
+              classNames={{ trigger: 'rounded-md border-1' }}
+            >
+              {(categories ?? []).map((category: any) => (
+                <SelectItem key={category.name}>{category.name}</SelectItem>
+              ))}
+            </Select>
+          </div>
+
+          {/* RIGHT - Buttons */}
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="solid"
+              color="primary"
+              className="rounded-md border-1"
+              onPress={handleReset}
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
+
         <Table
           columns={columns}
           dataSource={posts?.data || []}
@@ -178,7 +242,7 @@ export default function NewsPage() {
             },
           }}
           // onChange={handleChange}
-          scroll={{ x: 700 }}
+          scroll={{ x: 700, y: 'calc(100vh - 380px)' }}
         />
       </div>
 
