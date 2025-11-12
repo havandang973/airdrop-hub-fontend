@@ -103,7 +103,7 @@ export default function AirdropDetailPage() {
         <div className="flex flex-col gap-1">
           <span className="text-sm text-gray-500">Total raised</span>
           <span className="font-semibold text-xl md:text-2xl">
-            {selectedAirdrop?.raise ? `$ ${selectedAirdrop.raise}` : 'N/A'}
+            {selectedAirdrop?.raise ? `$ ${selectedAirdrop.raise}M` : 'N/A'}
           </span>
         </div>
 
@@ -146,51 +146,59 @@ export default function AirdropDetailPage() {
               orientation="horizontal"
               className="flex gap-3 w-full overflow-x-auto lg:w-[30%] lg:flex-col h-fit max-h-[80vh] lg:sticky top-5"
             >
-              {airdropPosts.map((post) => (
-                <Card
-                  key={post.id}
-                  isPressable
-                  onPress={() => {
-                    const el = document.getElementById(`post-${post.id}`);
-                    if (el)
-                      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                  className={`min-w-[300px] transition-all border border-default-200 hover:border-primary p-2  ${
-                    post.status === 'Closed' ? 'opacity-50' : ''
-                  }`}
-                >
-                  <CardHeader className="flex flex-col items-start gap-5">
-                    <h3 className="font-semibold text-lg">{post.name}</h3>
-                    <div className="flex justify-between items-center w-full text-sm text-default-500">
-                      <div className="flex items-center gap-1">
-                        <IconPointFilled
-                          size={16}
-                          className={
-                            post.status === 'Completed'
-                              ? 'text-success'
-                              : 'text-danger'
-                          }
-                        />
-                        <Chip
-                          size="sm"
-                          color={
-                            post.status === 'Completed' ? 'success' : 'danger'
-                          }
-                          variant="flat"
-                        >
-                          {post.status ?? 'N/A'}
-                        </Chip>
+              {airdropPosts
+                .sort(
+                  (a: any, b: any) =>
+                    Date.parse(b.createdAt) - Date.parse(a.createdAt)
+                )
+                .map((post) => (
+                  <Card
+                    key={post.id}
+                    isPressable
+                    onPress={() => {
+                      const el = document.getElementById(`post-${post.id}`);
+                      if (el)
+                        el.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                    }}
+                    className={`min-w-[300px] transition-all border border-default-200 hover:border-primary p-2  ${
+                      post.status === 'Closed' ? 'opacity-50' : ''
+                    }`}
+                  >
+                    <CardHeader className="flex flex-col items-start gap-5">
+                      <h3 className="font-semibold text-lg">{post.name}</h3>
+                      <div className="flex justify-between items-center w-full text-sm text-default-500">
+                        <div className="flex items-center gap-1">
+                          <IconPointFilled
+                            size={16}
+                            className={
+                              post.status === 'Open'
+                                ? 'text-success'
+                                : 'text-danger'
+                            }
+                          />
+                          <Chip
+                            size="sm"
+                            color={
+                              post.status === 'Open' ? 'success' : 'danger'
+                            }
+                            variant="flat"
+                          >
+                            {post.status ?? 'N/A'}
+                          </Chip>
+                        </div>
+                        <span>
+                          📅{' '}
+                          {post.date
+                            ? new Date(post.date).toLocaleDateString()
+                            : 'No date'}
+                        </span>
                       </div>
-                      <span>
-                        📅{' '}
-                        {post.date
-                          ? new Date(post.date).toLocaleDateString()
-                          : 'No date'}
-                      </span>
-                    </div>
-                  </CardHeader>
-                </Card>
-              ))}
+                    </CardHeader>
+                  </Card>
+                ))}
             </ScrollShadow>
 
             {/* RIGHT - Nội dung post */}

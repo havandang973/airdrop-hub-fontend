@@ -102,8 +102,8 @@ export default function EditAirdropPostPage() {
           {/* 🟢 STATUS */}
           <Form.Item label="Status" name="status">
             <Select placeholder="Select status (optional)" allowClear>
+              <Select.Option value="Open">Open</Select.Option>
               <Select.Option value="Closed">Closed</Select.Option>
-              <Select.Option value="Completed">Completed</Select.Option>
             </Select>
           </Form.Item>
 

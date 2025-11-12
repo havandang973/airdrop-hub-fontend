@@ -89,13 +89,13 @@ export const Navbar = () => {
       label: trans('News'),
       href: '/news',
       icon: <IconArticle size={16} />,
-      children: [
-        ...(categories?.map((cat: any) => ({
-          label: cat.name,
-          href: `/news#${cat.name}`,
-          icon: categoryIcons[cat.name] || <IconArticle size={16} />,
-        })) || []),
-      ],
+      // children: [
+      //   ...(categories?.map((cat: any) => ({
+      //     label: cat.name,
+      //     href: `/news#${cat.name}`,
+      //     icon: categoryIcons[cat.name] || <IconArticle size={16} />,
+      //   })) || []),
+      // ],
     },
     {
       label: trans('About'),
@@ -180,7 +180,8 @@ export const Navbar = () => {
                       return (
                         <li key={child.href}>
                           <NextLink
-                            href={childUrl}
+                            scroll={false}
+                            href={childUrl + '#okok'}
                             className={clsx(
                               'flex items-center gap-2 px-2 py-1 transition',
                               isActiveChild
@@ -191,6 +192,15 @@ export const Navbar = () => {
                             {child.icon}
                             {child.label}
                           </NextLink>
+
+                          {/* <NextLink
+                            href={{
+                              pathname: '/vi/tin-tuc',
+                              hash: 'Airdrop',
+                            }}
+                          >
+                            Link tới Airdrop
+                          </NextLink> */}
                         </li>
                       );
                     })}
