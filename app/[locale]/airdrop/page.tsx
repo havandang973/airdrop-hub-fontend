@@ -63,14 +63,14 @@ export default function Page() {
 
           <div className="mt-6">
             <Link
-              isExternal
+              // isExternal
               className={buttonStyles({
                 color: 'primary',
                 radius: 'full',
                 variant: 'shadow',
                 size: 'lg',
               })}
-              href={siteConfig.links.docs}
+              href={'/'}
             >
               Bắt đầu ngay
             </Link>

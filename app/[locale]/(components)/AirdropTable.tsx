@@ -257,7 +257,7 @@ const AirdropTable = () => {
             className="rounded-md border-1"
             onPress={handleReset}
           >
-            Reset
+            Đặt lại
           </Button>
         </div>
       </div>

@@ -75,7 +75,7 @@ export default function Page() {
 
   const columns: ColumnsType<any> = [
     {
-      title: 'Name',
+      title: 'Tên',
       dataIndex: 'name',
       key: 'name',
       fixed: 'left',
@@ -102,11 +102,10 @@ export default function Page() {
       ),
     },
     {
-      title: 'Raise',
+      title: 'Vốn huy động',
       dataIndex: 'raise',
       key: 'raise',
       align: 'right',
-      width: 140,
       sorter: (a, b) => toNumber(a.raise || '') - toNumber(b.raise || ''),
       sortOrder: sortedInfo.columnKey === 'raise' ? sortedInfo.order : null,
       ellipsis: true,
@@ -117,7 +116,7 @@ export default function Page() {
       render: (text, record) => <span>{text}</span>,
     },
     {
-      title: 'Status',
+      title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
       sorter: (a, b) => (a.status || '').localeCompare(b.status || ''),
@@ -131,7 +130,7 @@ export default function Page() {
       ),
     },
     {
-      title: 'Date',
+      title: 'Ngày',
       dataIndex: 'date',
       key: 'date',
       sorter: (a, b) =>
@@ -192,7 +191,7 @@ export default function Page() {
 
       <div className="flex flex-col">
         <span className="font-semibold text-xl md:text-2xl">
-          {data?.name} Funding Rounds
+          Vòng gọi vốn của {data?.name}
         </span>
       </div>
 
@@ -292,7 +291,7 @@ export default function Page() {
               className="rounded-md border-1"
               onPress={handleReset}
             >
-              Reset
+              Đặt lại
             </Button>
           </div>
         </div>

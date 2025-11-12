@@ -49,7 +49,7 @@ export default function NewsFilterTabs({
           <Tab
             key={item.key}
             title={
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 capitalize">
                 {item.icon}
                 <span>{item.label}</span>
               </div>
