@@ -24,6 +24,7 @@ export default function TinyEditor({
           'codesample',
           'emoticons',
           'link',
+          'image',
           'lists',
           'media',
           'searchreplace',
@@ -31,7 +32,26 @@ export default function TinyEditor({
           'visualblocks',
           'wordcount',
         ],
-
+        file_picker_types: 'image',
+        file_picker_callback: (callback: any, value: any, meta: any) => {
+          if (meta.filetype === 'image') {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.onchange = async function () {
+              const file = (this as HTMLInputElement).files?.[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                  const base64 = reader.result as string;
+                  callback(base64, { title: file.name });
+                };
+                reader.readAsDataURL(file);
+              }
+            };
+            input.click();
+          }
+        },
         toolbar:
           'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography uploadcare | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
         tinycomments_mode: 'embedded',

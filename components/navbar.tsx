@@ -51,7 +51,7 @@ export const Navbar = () => {
         input: 'text-sm',
       }}
       labelPlacement="outside"
-      placeholder="Search..."
+      placeholder="Tìm kiếm..."
       startContent={
         <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
       }

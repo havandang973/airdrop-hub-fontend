@@ -113,13 +113,13 @@ export default function EditAirdropPostPage() {
           </Form.Item>
 
           {/* 🟢 visibility */}
-          <Form.Item
+          {/* <Form.Item
             label="Visibility"
             name="Visibility"
             valuePropName="checked"
           >
             <Switch />
-          </Form.Item>
+          </Form.Item> */}
 
           {/* 🟢 AIRDROP */}
           <Form.Item

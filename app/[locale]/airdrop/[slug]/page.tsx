@@ -93,7 +93,7 @@ export default function AirdropDetailPage() {
 
         {/* Trạng thái */}
         <div className="flex flex-col gap-1">
-          <span className="text-sm">Status</span>
+          <span className="text-sm text-gray-500">Trạng thái</span>
           <span className="font-semibold text-xl md:text-2xl text-blue-500 capitalize">
             {selectedAirdrop?.status ?? 'N/A'}
           </span>
@@ -101,7 +101,7 @@ export default function AirdropDetailPage() {
 
         {/* Tổng số vốn raise */}
         <div className="flex flex-col gap-1">
-          <span className="text-sm text-gray-500">Total raised</span>
+          <span className="text-sm text-gray-500">Vốn huy động</span>
           <span className="font-semibold text-xl md:text-2xl">
             {selectedAirdrop?.raise ? `$ ${selectedAirdrop.raise}M` : 'N/A'}
           </span>
@@ -109,7 +109,7 @@ export default function AirdropDetailPage() {
 
         {/* Danh sách quỹ */}
         <div className="flex flex-col gap-2">
-          <span className="text-sm text-gray-500">Funds and Investors</span>
+          <span className="text-sm text-gray-500">Quỹ và nhà đầu tư</span>
           <div className="flex items-center gap-2 max-w-[250px] ml-2.5">
             <AvatarGroup isBordered max={5} size="sm">
               {selectedAirdrop?.funds?.length ? (
@@ -135,7 +135,9 @@ export default function AirdropDetailPage() {
 
       {/* Main content */}
       <div className="flex flex-col gap-6">
-        <h1 className="font-semibold text-xl md:text-2xl">Airdrop Posts</h1>
+        <h1 className="font-semibold text-xl md:text-2xl text-gray-700">
+          Hướng dẫn hoàn thành nhiệm vụ và hoạt động cho {selectedAirdrop?.name}
+        </h1>
 
         {!airdropPosts.length ? (
           <div className="text-gray-500 italic">No posts available.</div>

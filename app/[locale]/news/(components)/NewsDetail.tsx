@@ -26,7 +26,7 @@ export default function NewsDetailPage() {
   const { data: article, isLoading } = useGetPost(slug, !!slug);
   const { data: recentPosts } = useGetPosts({
     page: 1,
-    size: 5,
+    size: 6,
     category: 'all',
     visibility: 1,
   });
@@ -114,55 +114,57 @@ export default function NewsDetailPage() {
         <div className="sticky top-20">
           <h2 className="text-lg font-semibold mb-4">Bài viết mới nhất</h2>
           <div className="!space-y-5">
-            {recentPosts?.data.map((post: any) => (
-              <ConfigProvider
-                key={post.id}
-                theme={{
-                  token: {
-                    colorBgContainer: 'transparent',
-                    colorText: '#fff',
-                  },
-                  components: {
-                    Card: {
-                      bodyPadding: 10,
+            {recentPosts?.data
+              .filter((p: any) => p.id !== post.id)
+              .map((post: any) => (
+                <ConfigProvider
+                  key={post.id}
+                  theme={{
+                    token: {
+                      colorBgContainer: 'transparent',
+                      colorText: '#fff',
                     },
-                  },
-                }}
-              >
-                <Card
-                  hoverable
-                  bordered={false}
-                  className="flex items-center shadow-sm rounded-xl bg-white dark:bg-gray-800 dark:border-gray-700"
+                    components: {
+                      Card: {
+                        bodyPadding: 10,
+                      },
+                    },
+                  }}
                 >
-                  <div className="flex gap-4">
-                    <Image
-                      src={post.thumbnail || '/default-thumbnail.jpg'}
-                      alt={post.title}
-                      width={100}
-                      height={100}
-                      className="rounded-md object-cover"
-                    />
+                  <Card
+                    hoverable
+                    bordered={false}
+                    className="flex items-center shadow-sm rounded-xl bg-white dark:bg-gray-800 dark:border-gray-700"
+                  >
+                    <div className="flex gap-4">
+                      <Image
+                        src={post.thumbnail || '/default-thumbnail.jpg'}
+                        alt={post.title}
+                        width={100}
+                        height={100}
+                        className="rounded-md object-cover"
+                      />
 
-                    <div className="flex-1">
-                      <Link
-                        href={
-                          post.category?.name
-                            ? `/${locale}/news/${post.category.name}/${post.slug}`
-                            : `/${locale}/news/${post.slug}`
-                        }
-                        className="font-medium text-base hover:text-blue-600 dark:hover:text-blue-400 line-clamp-2"
-                      >
-                        {post.title}
-                      </Link>
-                      <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                        <CalendarOutlined className="mr-1" />
-                        {new Date(post.createdAt).toLocaleDateString('vi-VN')}
-                      </p>
+                      <div className="flex-1">
+                        <Link
+                          href={
+                            post.category?.name
+                              ? `/${locale}/news/${post.category.name}/${post.slug}`
+                              : `/${locale}/news/${post.slug}`
+                          }
+                          className="font-medium text-base hover:text-blue-600 dark:hover:text-blue-400 line-clamp-2"
+                        >
+                          {post.title}
+                        </Link>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                          <CalendarOutlined className="mr-1" />
+                          {new Date(post.createdAt).toLocaleDateString('vi-VN')}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              </ConfigProvider>
-            ))}
+                  </Card>
+                </ConfigProvider>
+              ))}
           </div>
         </div>
       </div>

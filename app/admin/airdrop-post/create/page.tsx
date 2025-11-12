@@ -81,9 +81,9 @@ export default function Page() {
             <Input type="date" placeholder="Select date (optional)" />
           </Form.Item>
 
-          <Form.Item label="Hide" name="hide">
+          {/* <Form.Item label="Hide" name="hide">
             <Switch />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item
             label="Airdrop"
