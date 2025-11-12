@@ -72,8 +72,8 @@ export default function Page() {
           {/* 🟢 STATUS */}
           <Form.Item label="Status" name="status">
             <Select placeholder="Select status (optional)" allowClear>
+              <Select.Option value="Open">Open</Select.Option>
               <Select.Option value="Closed">Closed</Select.Option>
-              <Select.Option value="Compeleted">Compeleted</Select.Option>
             </Select>
           </Form.Item>
 

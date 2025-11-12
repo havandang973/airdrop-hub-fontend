@@ -80,7 +80,7 @@ const AirdropTable = () => {
       sorter: (a: any, b: any) =>
         toNumber(a.raise || '') - toNumber(b.raise || ''),
       sortOrder: sortedInfo.columnKey === 'raise' ? sortedInfo.order : null,
-      render: (text: string) => <span>$ {text} M</span>,
+      render: (text: string) => <span>$ {text}M</span>,
     },
     {
       title: 'Trạng thái',
