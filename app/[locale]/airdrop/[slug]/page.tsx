@@ -134,7 +134,7 @@ export default function AirdropDetailPage() {
       </div>
 
       {/* Main content */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 ">
         <h1 className="font-semibold text-xl md:text-2xl text-gray-700">
           Hướng dẫn hoàn thành nhiệm vụ và hoạt động cho {selectedAirdrop?.name}
         </h1>
@@ -146,7 +146,7 @@ export default function AirdropDetailPage() {
             {/* LEFT - Danh sách post */}
             <ScrollShadow
               orientation="horizontal"
-              className="flex gap-3 w-full overflow-x-auto lg:w-[30%] lg:flex-col h-fit max-h-[80vh] lg:sticky top-5"
+              className="flex gap-3 w-full overflow-x-auto lg:w-[30%] lg:flex-col h-fit max-h-[80vh] lg:sticky top-20"
             >
               {airdropPosts
                 .sort(
@@ -165,7 +165,7 @@ export default function AirdropDetailPage() {
                           block: 'start',
                         });
                     }}
-                    className={`min-w-[300px] transition-all border border-default-200 hover:border-primary p-2  ${
+                    className={`min-w-[300px] transition-all border border-default-200 hover:border-primary p-2 ${
                       post.status === 'Closed' ? 'opacity-50' : ''
                     }`}
                   >
@@ -209,7 +209,7 @@ export default function AirdropDetailPage() {
                 <Card
                   key={post.id}
                   id={`post-${post.id}`}
-                  className={`border border-default-200 shadow-sm scroll-mt-24 p-4 ${
+                  className={`border border-default-200 shadow-sm scroll-mt-40 p-4 ${
                     post.status === 'Closed' ? 'opacity-50' : ''
                   }`}
                 >
