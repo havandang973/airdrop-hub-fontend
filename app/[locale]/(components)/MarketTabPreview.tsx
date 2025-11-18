@@ -31,7 +31,7 @@ export default function MarketTabPreview() {
         </span>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 text-sm mt-1">
+      {/* <div className="grid grid-cols-2 gap-2 text-sm mt-1">
         <div>
           <p className="text-gray-500 dark:text-gray-400 text-xs">Tăng</p>
           <p className="font-semibold text-green-500">{totalUp}</p>
@@ -40,7 +40,7 @@ export default function MarketTabPreview() {
           <p className="text-gray-500 dark:text-gray-400 text-xs">Giảm</p>
           <p className="font-semibold text-red-500">{totalDown}</p>
         </div>
-      </div>
+      </div> */}
 
       <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
         Nổi bật:{' '}
