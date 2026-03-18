@@ -2,6 +2,7 @@ import { title } from '@/components/primitives';
 import { useTranslations } from 'next-intl';
 
 export default function AboutPage() {
+  console.log('Rendering AboutPage');
   const trans = useTranslations();
 
   return (
