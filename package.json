@@ -9,7 +9,7 @@
     "lint": "eslint --fix"
   },
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   },
   "dependencies": {
     "@heroui/accordion": "2.2.23",
