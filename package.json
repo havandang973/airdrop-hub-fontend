@@ -11,7 +11,6 @@
   "engines": {
     "node": "20.x"
   },
-  "packageManager": "pnpm@9.15.0",
   "dependencies": {
     "@heroui/accordion": "2.2.23",
     "@heroui/alert": "2.2.26",
