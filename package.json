@@ -9,9 +9,10 @@
     "lint": "eslint --fix"
   },
   "engines": {
-    "node": "24.x"
+    "node": "20.x",
+    "pnpm": ">=9.1.2"
   },
-  "packageManager": "pnpm@9.2.0",
+  "packageManager": "pnpm@9.15.0",
   "dependencies": {
     "@heroui/accordion": "2.2.23",
     "@heroui/alert": "2.2.26",
